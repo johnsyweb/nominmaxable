@@ -42,7 +42,8 @@ On **push** to `main` only, the workflow also **deploys** the `dist/` artefact t
 ## Data and caching
 
 - The fetch URL is configured in [`src/constants.ts`](./src/constants.ts) (not repeated in user-facing copy).
-- Cached under the key `parkrun.nominmaxable.events` with a versioned wrapper `{ v, fetchedAt, body }` where `body` is the raw response text.
+- Cached under the key `parkrun.nominmaxable.events` with a versioned wrapper `{ v, fetchedAt, body }` where `body` is the raw response text (stored in **`localStorage`** for this origin).
+- If **`localStorage`** hits the browser’s **per-origin quota**, `setItem` throws a `QuotaExceededError` (message is often “The quota has been exceeded.”). The app still **shows the freshly downloaded data** and explains in the status line that a local copy could not be saved.
 - If the cache is older than seven days, the app fetches again on load. If a refresh fails but a previous payload exists, stale data is shown with a warning.
 - If there is no usable cache and a fetch fails, the error banner shows a short **Details** line when available (for example **HTTP status** text from the server or the browser’s **network error** message). The same pattern applies when cached or downloaded data **cannot be parsed**.
 

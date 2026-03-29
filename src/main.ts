@@ -1,5 +1,5 @@
 import { computeSeriesBlocks, createNameCollator, parseParkrunDocument } from "./analytics";
-import { isFresh, readCache, writeCache } from "./cache";
+import { isFresh, isQuotaExceededError, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
 import { formatLastUpdated } from "./formatLastUpdated";
 import { renderSeriesBlocks } from "./render";
@@ -92,7 +92,10 @@ function setErrorVisible(visible: boolean, headline?: string, detail?: string | 
   }
 }
 
-function renderFromBody(body: string, context: { stale: boolean; fetchedAt: number }): void {
+function renderFromBody(
+  body: string,
+  context: { stale: boolean; fetchedAt: number; couldNotPersistLocally?: boolean }
+): void {
   try {
     const doc = parseParkrunDocument(body);
     const blocks = computeSeriesBlocks(doc, createNameCollator());
@@ -100,7 +103,9 @@ function renderFromBody(body: string, context: { stale: boolean; fetchedAt: numb
     setLastUpdated(
       context.stale
         ? `Showing cached data from ${formatLastUpdated(context.fetchedAt)} (may be out of date)`
-        : `Last updated ${formatLastUpdated(context.fetchedAt)}`
+        : context.couldNotPersistLocally
+          ? `Last updated ${formatLastUpdated(context.fetchedAt)} — not saved locally (browser storage for this site is full)`
+          : `Last updated ${formatLastUpdated(context.fetchedAt)}`
     );
     setStaleVisible(context.stale);
     setErrorVisible(false);
@@ -128,8 +133,20 @@ async function runFetch(cached: ReturnType<typeof readCache>): Promise<void> {
   try {
     const body = await fetchEventsBody();
     const fetchedAt = Date.now();
-    writeCache({ fetchedAt, body });
-    renderFromBody(body, { stale: false, fetchedAt });
+    let couldNotPersistLocally = false;
+    try {
+      writeCache({ fetchedAt, body });
+    } catch (cacheErr) {
+      if (isQuotaExceededError(cacheErr)) {
+        couldNotPersistLocally = true;
+        announcePolite(
+          "Event data loaded, but your browser could not save a local copy because storage for this site is full."
+        );
+      } else {
+        throw cacheErr;
+      }
+    }
+    renderFromBody(body, { stale: false, fetchedAt, couldNotPersistLocally });
   } catch (err) {
     if (cached?.body) {
       renderFromBody(cached.body, { stale: true, fetchedAt: cached.fetchedAt });
