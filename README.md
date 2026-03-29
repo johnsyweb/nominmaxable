@@ -6,7 +6,8 @@ Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
 ## Requirements
 
-- [pnpm](https://pnpm.io/) (see `packageManager` in `package.json`)
+- [mise](https://mise.jdx.dev/) with the versions in [`.tool-versions`](./.tool-versions) (run `mise install` in this directory)
+- [pnpm](https://pnpm.io/) (see `packageManager` in `package.json`; mise provides the matching version). Husky’s pre-commit hook runs `mise exec -- pnpm run precommit` when `mise` is available.
 
 ## Scripts
 
