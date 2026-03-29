@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  charCountForExtremeNames,
   classifySeriesId,
   compareCountryCodes,
   computeSeriesBlocks,
@@ -73,6 +74,17 @@ describe("compareCountryCodes", () => {
     const a = "aa";
     const b = "ab";
     expect(compareCountryCodes(a, b, collator)).toBe(collator.compare(a, b));
+  });
+});
+
+describe("charCountForExtremeNames", () => {
+  it("returns null for an empty list", () => {
+    expect(charCountForExtremeNames([])).toBeNull();
+  });
+
+  it("returns the string length of the first entry", () => {
+    expect(charCountForExtremeNames(["hello"])).toBe(5);
+    expect(charCountForExtremeNames(["aa", "bb"])).toBe(2);
   });
 });
 
@@ -172,6 +184,10 @@ describe("computeSeriesBlocks", () => {
     const country1 = series1.countries.find((c) => c.countryCode === "1");
     expect(country1?.shortest).toEqual(["Short"]);
     expect(country1?.longest).toEqual(["Much longer name"]);
+    expect(series1.globalLongestCharCount).toBe("Much longer name".length);
+    expect(series1.globalShortestCharCount).toBe("Tiny".length);
+    expect(country1?.longestCharCount).toBe("Much longer name".length);
+    expect(country1?.shortestCharCount).toBe("Short".length);
   });
 
   it("omits unknown series when empty", () => {

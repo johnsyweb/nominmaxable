@@ -18,6 +18,8 @@ export interface CountryRow {
   countryUrl: string;
   longest: string[];
   shortest: string[];
+  longestCharCount: number | null;
+  shortestCharCount: number | null;
 }
 
 export interface SeriesBlock {
@@ -26,4 +28,6 @@ export interface SeriesBlock {
   countries: CountryRow[];
   globalLongest: string[];
   globalShortest: string[];
+  globalLongestCharCount: number | null;
+  globalShortestCharCount: number | null;
 }

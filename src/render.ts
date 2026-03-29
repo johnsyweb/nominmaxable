@@ -25,6 +25,15 @@ function appendNameList(cell: HTMLTableCellElement, names: string[]): void {
   cell.appendChild(ul);
 }
 
+function setCharacterCountCell(cell: HTMLTableCellElement, count: number | null): void {
+  if (count === null) {
+    cell.textContent = "—";
+    return;
+  }
+  cell.textContent = String(count);
+  cell.className = "data-table__count";
+}
+
 function renderCountryTable(block: SeriesBlock): HTMLTableElement {
   const table = document.createElement("table");
   table.className = "data-table";
@@ -38,7 +47,9 @@ function renderCountryTable(block: SeriesBlock): HTMLTableElement {
     "Country",
     "Country site",
     "Longest EventLongName",
+    "Longest character count",
     "Shortest EventLongName",
+    "Shortest character count",
   ]) {
     const th = document.createElement("th");
     th.scope = "col";
@@ -69,9 +80,15 @@ function renderCountryTable(block: SeriesBlock): HTMLTableElement {
     const tdLong = document.createElement("td");
     appendNameList(tdLong, row.longest);
     tr.appendChild(tdLong);
+    const tdLongCount = document.createElement("td");
+    setCharacterCountCell(tdLongCount, row.longestCharCount);
+    tr.appendChild(tdLongCount);
     const tdShort = document.createElement("td");
     appendNameList(tdShort, row.shortest);
     tr.appendChild(tdShort);
+    const tdShortCount = document.createElement("td");
+    setCharacterCountCell(tdShortCount, row.shortestCharCount);
+    tr.appendChild(tdShortCount);
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
@@ -87,6 +104,23 @@ function renderGlobalSection(block: SeriesBlock): HTMLElement {
   caption.className = "visually-hidden";
   caption.textContent = `Global results for ${block.title}`;
   table.appendChild(caption);
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  const thMeasure = document.createElement("th");
+  thMeasure.scope = "col";
+  thMeasure.className = "visually-hidden";
+  thMeasure.textContent = "Measure";
+  headRow.appendChild(thMeasure);
+  const thNames = document.createElement("th");
+  thNames.scope = "col";
+  thNames.textContent = "EventLongName";
+  headRow.appendChild(thNames);
+  const thCount = document.createElement("th");
+  thCount.scope = "col";
+  thCount.textContent = "Character count";
+  headRow.appendChild(thCount);
+  thead.appendChild(headRow);
+  table.appendChild(thead);
   const tbody = document.createElement("tbody");
   const rowLong = document.createElement("tr");
   const thL = document.createElement("th");
@@ -96,6 +130,9 @@ function renderGlobalSection(block: SeriesBlock): HTMLElement {
   const tdL = document.createElement("td");
   appendNameList(tdL, block.globalLongest);
   rowLong.appendChild(tdL);
+  const tdLCount = document.createElement("td");
+  setCharacterCountCell(tdLCount, block.globalLongestCharCount);
+  rowLong.appendChild(tdLCount);
   tbody.appendChild(rowLong);
   const rowShort = document.createElement("tr");
   const thS = document.createElement("th");
@@ -105,6 +142,9 @@ function renderGlobalSection(block: SeriesBlock): HTMLElement {
   const tdS = document.createElement("td");
   appendNameList(tdS, block.globalShortest);
   rowShort.appendChild(tdS);
+  const tdSCount = document.createElement("td");
+  setCharacterCountCell(tdSCount, block.globalShortestCharCount);
+  rowShort.appendChild(tdSCount);
   tbody.appendChild(rowShort);
   table.appendChild(tbody);
   wrap.appendChild(table);

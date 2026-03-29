@@ -86,6 +86,11 @@ function getBucket(map: Map<SeriesKey, Bucket>, key: SeriesKey): Bucket {
   return bucket;
 }
 
+/** All names returned by `extremeNames` for a non-empty set share this length. */
+export function charCountForExtremeNames(names: string[]): number | null {
+  return names.length > 0 ? names[0].length : null;
+}
+
 export function extremeNames(
   names: Set<string>,
   mode: "longest" | "shortest",
@@ -124,11 +129,15 @@ function buildCountryRows(
   return codes.map((countryCode) => {
     const names = bucket.perCountry.get(countryCode) ?? new Set<string>();
     const countryUrl = doc.countries[countryCode]?.url ?? "";
+    const longest = extremeNames(names, "longest", collator);
+    const shortest = extremeNames(names, "shortest", collator);
     return {
       countryCode,
       countryUrl,
-      longest: extremeNames(names, "longest", collator),
-      shortest: extremeNames(names, "shortest", collator),
+      longest,
+      shortest,
+      longestCharCount: charCountForExtremeNames(longest),
+      shortestCharCount: charCountForExtremeNames(shortest),
     };
   });
 }
@@ -181,22 +190,30 @@ export function computeSeriesBlocks(
     if (bucket.allNames.size === 0) {
       continue;
     }
+    const globalLongest = extremeNames(bucket.allNames, "longest", collator);
+    const globalShortest = extremeNames(bucket.allNames, "shortest", collator);
     blocks.push({
       title: getSeriesHeading(id),
       isUnknown: false,
       countries: buildCountryRows(doc, bucket, collator),
-      globalLongest: extremeNames(bucket.allNames, "longest", collator),
-      globalShortest: extremeNames(bucket.allNames, "shortest", collator),
+      globalLongest,
+      globalShortest,
+      globalLongestCharCount: charCountForExtremeNames(globalLongest),
+      globalShortestCharCount: charCountForExtremeNames(globalShortest),
     });
   }
 
   if (unknownBucket && unknownBucket.allNames.size > 0) {
+    const globalLongest = extremeNames(unknownBucket.allNames, "longest", collator);
+    const globalShortest = extremeNames(unknownBucket.allNames, "shortest", collator);
     blocks.push({
       title: UNKNOWN_SERIES_HEADING,
       isUnknown: true,
       countries: buildCountryRows(doc, unknownBucket, collator),
-      globalLongest: extremeNames(unknownBucket.allNames, "longest", collator),
-      globalShortest: extremeNames(unknownBucket.allNames, "shortest", collator),
+      globalLongest,
+      globalShortest,
+      globalLongestCharCount: charCountForExtremeNames(globalLongest),
+      globalShortestCharCount: charCountForExtremeNames(globalShortest),
     });
   }
 

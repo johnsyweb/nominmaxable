@@ -356,6 +356,12 @@ a {
   background: #eeeeee;
 }
 
+.data-table__count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .name-list {
   margin: 0;
   padding-left: 1.15rem;

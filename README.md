@@ -1,6 +1,6 @@
 # nominmaxable
 
-Small static site that reads the public parkrun events GeoJSON, caches it in your browser for seven days, and reports the **longest** and **shortest** `EventLongName` values (by JavaScript string length after trimming) **per event series** and **per country**, plus **global** extremes within each series.
+Small static site that reads the public parkrun events GeoJSON, caches it in your browser for seven days, and reports the **longest** and **shortest** `EventLongName` values (by JavaScript string length after trimming) **per event series** and **per country**, plus **global** extremes within each series. Tables include **character count** columns next to each EventLongName list (one count per cell; tied names share the same length).
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
