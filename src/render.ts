@@ -302,9 +302,9 @@ function renderCountryTable(block: SeriesBlock, collator: Intl.Collator): HTMLTa
   const hr = document.createElement("tr");
   appendSortableCountryHeader(hr, "Country", "country");
   appendSortableCountryHeader(hr, "Country site", "site");
-  appendSortableCountryHeader(hr, "Longest EventLongName", "longestNames");
+  appendSortableCountryHeader(hr, "Longest Full Event Name", "longestNames");
   appendSortableCountryHeader(hr, "Longest character count", "longestCount");
-  appendSortableCountryHeader(hr, "Shortest EventLongName", "shortestNames");
+  appendSortableCountryHeader(hr, "Shortest Full Event Name", "shortestNames");
   appendSortableCountryHeader(hr, "Shortest character count", "shortestCount");
   thead.appendChild(hr);
   table.appendChild(thead);
@@ -327,7 +327,7 @@ function renderGlobalSection(block: SeriesBlock, collator: Intl.Collator): HTMLE
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
   appendSortableGlobalHeader(headRow, "Measure", "measure", true);
-  appendSortableGlobalHeader(headRow, "EventLongName", "names", false);
+  appendSortableGlobalHeader(headRow, "Full Event Name", "names", false);
   appendSortableGlobalHeader(headRow, "Character count", "count", false);
   thead.appendChild(headRow);
   table.appendChild(thead);

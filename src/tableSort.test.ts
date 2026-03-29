@@ -82,7 +82,7 @@ describe("globalRowsFromBlock and sortGlobalRows", () => {
 });
 
 describe("compareGlobalRowsByColumn", () => {
-  it("compares first EventLongName in names column", () => {
+  it("compares first full event name in names column", () => {
     const a = { label: "L", names: ["zebra"], charCount: 1 };
     const b = { label: "S", names: ["apple"], charCount: 1 };
     expect(compareGlobalRowsByColumn(a, b, "names", collator)).toBeGreaterThan(0);

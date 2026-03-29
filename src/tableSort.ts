@@ -20,12 +20,12 @@ export interface GlobalTableRow {
 export function globalRowsFromBlock(block: SeriesBlock): GlobalTableRow[] {
   return [
     {
-      label: "Longest EventLongName",
+      label: "Longest Full Event Name",
       names: block.globalLongest,
       charCount: block.globalLongestCharCount,
     },
     {
-      label: "Shortest EventLongName",
+      label: "Shortest Full Event Name",
       names: block.globalShortest,
       charCount: block.globalShortestCharCount,
     },

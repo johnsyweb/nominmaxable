@@ -1,7 +1,7 @@
 {
   "name": "nominmaxable",
   "version": "1.0.0",
-  "description": "parkrun EventLongName length analysis by series and country",
+  "description": "parkrun full event name length analysis by series and country",
   "type": "module",
   "scripts": {
     "build": "vite build",
