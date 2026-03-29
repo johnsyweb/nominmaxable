@@ -27,7 +27,7 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 
 ## CI/CD
 
-[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** and **pull request** to `main`:
+[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** (any branch) and on **pull requests**:
 
 1. Installs **Node** and **pnpm** via [mise](https://mise.jdx.dev/) using [`.tool-versions`](./.tool-versions) (same as local development).
 2. Runs **`pnpm install --frozen-lockfile`** with **`HUSKY=0`** so Husky does not run in CI.
