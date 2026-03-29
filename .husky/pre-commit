@@ -1,0 +1,7 @@
+#!/bin/sh
+cd "$(dirname "$0")/.." || exit 1
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm run precommit
+else
+  npx --yes pnpm@10.26.0 run precommit
+fi

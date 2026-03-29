@@ -1,0 +1,37 @@
+{
+  "name": "nominmaxable",
+  "version": "1.0.0",
+  "description": "parkrun EventLongName length analysis by series and country",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
+    "typecheck": "tsc --noEmit",
+    "precommit": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run test:run",
+    "prepare": "husky"
+  },
+  "keywords": ["parkrun"],
+  "author": "Pete Johns",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.0.2",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  },
+  "packageManager": "pnpm@10.26.0"
+}

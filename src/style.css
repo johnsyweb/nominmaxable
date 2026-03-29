@@ -1,0 +1,259 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #0f1419;
+  --muted: #4a5568;
+  --border: #d5dbe3;
+  --accent: #0b5fff;
+  --accent-contrast: #ffffff;
+  --warning-bg: #fff8e6;
+  --warning-border: #e3a008;
+  --error-bg: #fdecea;
+  --error-border: #c62828;
+  --focus: #0b5fff;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1419;
+    --surface: #161d27;
+    --text: #eef2f7;
+    --muted: #a7b4c6;
+    --border: #2a3545;
+    --accent: #6ea8ff;
+    --accent-contrast: #0f1419;
+    --warning-bg: #2a2412;
+    --warning-border: #e3a008;
+    --error-bg: #2a1818;
+    --error-border: #f28b82;
+    --focus: #9cc3ff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.75rem;
+  z-index: 1000;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--focus);
+  border-radius: 0.25rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  left: 0.75rem;
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.site-header__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 1.25rem;
+}
+
+.site-header__crumb {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.site-header__crumb a {
+  color: var(--accent);
+}
+
+.site-header__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 2.2vw, 2.25rem);
+  letter-spacing: -0.02em;
+}
+
+.site-header__lede {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--muted);
+}
+
+.banner {
+  max-width: 72rem;
+  margin: 1rem auto 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.35rem;
+  border: 1px solid var(--border);
+}
+
+.banner p {
+  margin: 0;
+}
+
+.banner--warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+.banner--error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+}
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 3rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 0.35rem;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+}
+
+.button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.last-updated {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.series-section {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.series-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+}
+
+.series-section h4 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.65rem;
+  vertical-align: top;
+  text-align: left;
+}
+
+.data-table thead th {
+  background: color-mix(in srgb, var(--surface) 80%, var(--border));
+}
+
+.name-list {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.name-list li {
+  margin: 0.15rem 0;
+}
+
+.data-table a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+}
+
+.data-table a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.global-block {
+  margin-top: 0.25rem;
+}
+
+.empty-state {
+  color: var(--muted);
+}
+
+.site-footer {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 2.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.site-footer a {
+  color: var(--accent);
+}
+
+code {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.92em;
+}

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f6f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)" />
+    <title>nominmaxable | johnsy.com</title>
+    <meta
+      name="description"
+      content="Explore longest and shortest parkrun EventLongName values by series and country, using cached parkrun events data."
+    />
+    <link rel="canonical" href="https://www.johnsy.com/nominmaxable/" />
+    <meta name="author" content="Pete Johns" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <p class="site-header__crumb">
+          <a href="https://www.johnsy.com/">johnsy.com</a>
+        </p>
+        <h1 class="site-header__title">nominmaxable</h1>
+        <p class="site-header__lede">
+          Longest and shortest <code>EventLongName</code> strings (by character count) from the
+          public parkrun events feed, grouped by event series and country.
+        </p>
+      </div>
+    </header>
+
+    <div id="sr-polite" class="visually-hidden" aria-live="polite"></div>
+
+    <div id="stale-banner" role="status" class="banner banner--warning" hidden>
+      <p>
+        Showing cached data because the latest download did not succeed. Use
+        <strong>Refresh data</strong> to try again.
+      </p>
+    </div>
+
+    <div id="error-banner" role="alert" class="banner banner--error" hidden></div>
+
+    <main id="main-content" aria-busy="false">
+      <div class="toolbar">
+        <button type="button" id="btn-refresh" class="button">Refresh data</button>
+        <p id="last-updated" class="last-updated" aria-live="polite"></p>
+      </div>
+      <div id="results" aria-label="Analysis results"></div>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Data source:
+        <a href="https://images.parkrun.com/events.json">images.parkrun.com/events.json</a>. Cached
+        in your browser for seven days. Not affiliated with parkrun Limited.
+      </p>
+    </footer>
+
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>
