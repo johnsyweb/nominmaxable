@@ -1,43 +1,16 @@
+/* parkrun colour palette — shared with ambassy, eventuate, foretoken, pr-by-pt */
 :root {
-  color-scheme: light dark;
-  --bg: #f4f6f8;
-  --surface: #ffffff;
-  --text: #0f1419;
-  --muted: #4a5568;
-  --border: #d5dbe3;
-  --accent: #0b5fff;
-  --accent-contrast: #ffffff;
-  --warning-bg: #fff8e6;
-  --warning-border: #e3a008;
-  --error-bg: #fdecea;
-  --error-border: #c62828;
-  --focus: #0b5fff;
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  line-height: 1.5;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1419;
-    --surface: #161d27;
-    --text: #eef2f7;
-    --muted: #a7b4c6;
-    --border: #2a3545;
-    --accent: #6ea8ff;
-    --accent-contrast: #0f1419;
-    --warning-bg: #2a2412;
-    --warning-border: #e3a008;
-    --error-bg: #2a1818;
-    --error-border: #f28b82;
-    --focus: #9cc3ff;
-  }
+  --parkrun-aubergine: #4c1a57;
+  --parkrun-apricot: #f7a541;
+  --parkrun-white: #ffffff;
+  --parkrun-black: #000000;
+  --parkrun-grey: #666666;
+  --parkrun-light-grey: #f5f5f5;
+  --parkrun-table-header: #f2f2f2;
+  --parkrun-table-border: #dddddd;
+  --parkrun-table-stripe: #f9f9f9;
+  --parkrun-focus-ring: #4a90e2;
+  --parkrun-link-underline: #bbdefb;
 }
 
 *,
@@ -47,29 +20,73 @@
 }
 
 body {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+  margin: 0;
+  background: var(--parkrun-light-grey);
+  color: var(--parkrun-black);
+  font-family:
+    "Atkinson Hyperlegible",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  font-size-adjust: 0.52;
+}
+
+a {
+  color: var(--parkrun-aubergine);
+  text-decoration: none;
+  border-bottom: 1px solid var(--parkrun-link-underline);
+  padding-bottom: 2px;
+}
+
+a:hover {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--parkrun-focus-ring);
+  outline-offset: 2px;
+}
+
+.site-header .breadcrumbs a,
+.site-footer a,
+.data-table a {
+  border-bottom-color: var(--parkrun-link-underline);
 }
 
 .skip-link {
   position: absolute;
-  left: -9999px;
+  left: 1rem;
   top: 0.75rem;
-  z-index: 1000;
-  padding: 0.5rem 1rem;
-  background: var(--surface);
-  color: var(--text);
-  border: 2px solid var(--focus);
-  border-radius: 0.25rem;
-  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  background: var(--parkrun-apricot);
+  color: var(--parkrun-black);
+  border-radius: 6px;
   font-weight: 600;
+  text-decoration: none;
+  border: none;
+  transform: translateY(-200%);
+  transition: transform 0.2s ease;
+  z-index: 1000;
 }
 
-.skip-link:focus {
-  left: 0.75rem;
-  outline: none;
+.skip-link:hover {
+  background: var(--parkrun-apricot);
+  color: var(--parkrun-black);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--parkrun-focus-ring);
+  outline-offset: 2px;
 }
 
 .visually-hidden {
@@ -85,43 +102,61 @@ body {
 }
 
 .site-header {
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 1px solid var(--parkrun-table-border);
+  background: var(--parkrun-white);
 }
 
 .site-header__inner {
-  max-width: 72rem;
+  max-width: 65ch;
+  width: 100%;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 1.25rem;
+  padding: 1rem 10px 1.25rem;
 }
 
-.site-header__crumb {
-  margin: 0 0 0.5rem;
-  font-size: 0.9rem;
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  width: fit-content;
+  background: var(--parkrun-light-grey);
 }
 
-.site-header__crumb a {
-  color: var(--accent);
+.breadcrumbs a {
+  border: none;
+  padding-bottom: 0;
+}
+
+.breadcrumbs span[aria-current="page"] {
+  font-weight: 600;
+  color: var(--parkrun-aubergine);
 }
 
 .site-header__title {
   margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 2.2vw, 2.25rem);
-  letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 4vw, 2rem);
+  line-height: 1.2;
+  color: var(--parkrun-aubergine);
 }
 
 .site-header__lede {
   margin: 0;
-  max-width: 52rem;
-  color: var(--muted);
+  max-width: 65ch;
+  color: var(--parkrun-grey);
 }
 
 .banner {
-  max-width: 72rem;
+  max-width: min(95vw, 80rem);
+  width: 92%;
   margin: 1rem auto 0;
   padding: 0.75rem 1rem;
-  border-radius: 0.35rem;
-  border: 1px solid var(--border);
+  border-radius: 6px;
+  border: 1px solid var(--parkrun-table-border);
+  background: var(--parkrun-white);
 }
 
 .banner p {
@@ -129,19 +164,23 @@ body {
 }
 
 .banner--warning {
-  background: var(--warning-bg);
-  border-color: var(--warning-border);
+  background: #fff8e6;
+  border-color: var(--parkrun-apricot);
+  color: var(--parkrun-black);
 }
 
 .banner--error {
-  background: var(--error-bg);
-  border-color: var(--error-border);
+  background: #fdecea;
+  border-color: #c62828;
+  color: var(--parkrun-black);
 }
 
 main {
-  max-width: 72rem;
+  flex: 1 0 auto;
+  max-width: min(95vw, 80rem);
+  width: 92%;
   margin: 0 auto;
-  padding: 1.25rem 1.25rem 3rem;
+  padding: 1.25rem 10px 3rem;
 }
 
 .toolbar {
@@ -150,48 +189,56 @@ main {
   gap: 0.75rem 1.25rem;
   align-items: center;
   margin-bottom: 1.5rem;
+  max-width: 65ch;
 }
 
 .button {
   font: inherit;
   cursor: pointer;
-  border-radius: 0.35rem;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: var(--accent-contrast);
-  padding: 0.55rem 1rem;
-  font-weight: 600;
+  border-radius: 6px;
+  border: 2px solid var(--parkrun-aubergine);
+  background: var(--parkrun-aubergine);
+  color: var(--parkrun-white);
+  padding: 0.55rem 1.1rem;
+  font-weight: 700;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+  background: var(--parkrun-aubergine);
+  color: var(--parkrun-white);
 }
 
 .button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline: 2px solid var(--parkrun-focus-ring);
   outline-offset: 2px;
 }
 
 .last-updated {
   margin: 0;
-  color: var(--muted);
-  font-size: 0.95rem;
+  color: var(--parkrun-grey);
+  font-size: 0.9rem;
 }
 
 .series-section {
   margin-bottom: 2.5rem;
   padding: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--surface);
+  border: 1px solid var(--parkrun-table-border);
+  border-radius: 6px;
+  background: var(--parkrun-white);
 }
 
 .series-section h2 {
   margin: 0 0 1rem;
   font-size: 1.35rem;
+  color: var(--parkrun-aubergine);
 }
 
 .series-section h4 {
   margin: 1.25rem 0 0.5rem;
   font-size: 1rem;
-  color: var(--muted);
-  font-weight: 600;
+  color: var(--parkrun-grey);
+  font-weight: 700;
 }
 
 .data-table {
@@ -202,14 +249,23 @@ main {
 
 .data-table th,
 .data-table td {
-  border: 1px solid var(--border);
+  border: 1px solid var(--parkrun-table-border);
   padding: 0.55rem 0.65rem;
   vertical-align: top;
   text-align: left;
 }
 
 .data-table thead th {
-  background: color-mix(in srgb, var(--surface) 80%, var(--border));
+  background: var(--parkrun-table-header);
+  font-weight: 700;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: var(--parkrun-table-stripe);
+}
+
+.data-table tbody tr:hover {
+  background: #eeeeee;
 }
 
 .name-list {
@@ -221,13 +277,8 @@ main {
   margin: 0.15rem 0;
 }
 
-.data-table a {
-  color: var(--accent);
-  text-decoration-thickness: 0.08em;
-}
-
 .data-table a:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline: 2px solid var(--parkrun-focus-ring);
   outline-offset: 2px;
 }
 
@@ -236,24 +287,28 @@ main {
 }
 
 .empty-state {
-  color: var(--muted);
+  color: var(--parkrun-grey);
+  max-width: 65ch;
 }
 
 .site-footer {
-  max-width: 72rem;
+  max-width: 65ch;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 1.25rem 2.5rem;
-  color: var(--muted);
-  font-size: 0.9rem;
+  padding: 0 10px 2.5rem;
+  color: var(--parkrun-grey);
+  font-size: 0.85rem;
 }
 
-.site-footer a {
-  color: var(--accent);
+.site-footer p {
+  margin: 0;
 }
 
 code {
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+  font:
+    0.85em "Atkinson Hyperlegible Mono",
+    Monaco,
+    Courier,
     monospace;
-  font-size: 0.92em;
+  font-size-adjust: 0.62;
 }

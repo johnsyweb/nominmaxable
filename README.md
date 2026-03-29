@@ -4,6 +4,8 @@ Small static site that reads the public parkrun events GeoJSON, caches it in you
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
+Visual design follows the same **parkrun palette** (aubergine, apricot, greys) and **Atkinson Hyperlegible** typefaces as sibling tools such as [Ambassy](https://www.johnsy.com/ambassy/), with reading-width layout (`65ch`) for header and footer prose and a wider column for data tables.
+
 ## Requirements
 
 - [mise](https://mise.jdx.dev/) with the versions in [`.tool-versions`](./.tool-versions) (run `mise install` in this directory)
