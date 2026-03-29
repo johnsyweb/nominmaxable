@@ -11,13 +11,16 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write \"src/**/*.{ts,html,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\" \"scripts/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\" \"scripts/**/*.mjs\"",
     "typecheck": "tsc --noEmit",
     "precommit": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run test:run",
+    "screenshots": "node scripts/capture-social-preview.mjs",
     "prepare": "husky"
   },
-  "keywords": ["parkrun"],
+  "keywords": [
+    "parkrun"
+  ],
   "author": "Pete Johns",
   "license": "MIT",
   "devDependencies": {
@@ -27,6 +30,7 @@
     "eslint": "^10.0.2",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
+    "playwright": "^1.58.2",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",

@@ -4,7 +4,7 @@ Small static site that reads a public JSON listing of parkrun events, caches it 
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
-**SEO and sharing:** [`src/index.html`](./src/index.html) includes canonical URL, keyword meta, **Open Graph** and **Twitter Card** tags, plus JSON-LD for a **WebApplication** and **BreadcrumbList**. The social preview image lives at [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (1200×630); Vite copies `src/public/` into the build root so it is served as `/nominmaxable/nominmaxable-social-preview.png` on the live site. When on-screen copy changes, replace that PNG with a fresh viewport capture from `pnpm build` then `pnpm preview` (open `/nominmaxable/`, scroll to top); if the capture is not exactly 1200×630, letterbox to that size (for example `magick in.png -resize 1200x -background '#f5f5f5' -gravity center -extent 1200x630 out.png`).
+**SEO and sharing:** [`src/index.html`](./src/index.html) includes canonical URL, keyword meta, **Open Graph** and **Twitter Card** tags, plus JSON-LD for a **WebApplication** and **BreadcrumbList**. The social preview image lives at [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (1200×630); Vite copies `src/public/` into the build root so it is served as `/nominmaxable/nominmaxable-social-preview.png` on the live site. After changing visible copy, run **`pnpm run screenshots`** to rebuild, start a temporary preview on a free port, and overwrite that PNG (requires a one-time **`pnpm exec playwright install chromium`** after `pnpm install`).
 
 The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables. On narrow viewports, wide tables sit in **horizontally scrollable** regions (keyboard-focusable), with **larger sort-button tap targets**, **16px table text**, and **wrapped** long names so cells stay readable.
 
@@ -26,6 +26,7 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 | `pnpm format`     | Prettier write                           |
 | `pnpm format:check` | Prettier check                        |
 | `pnpm precommit`  | Format check, lint, typecheck, build, tests |
+| `pnpm screenshots` | Regenerate [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (Playwright; needs `pnpm exec playwright install chromium` once) |
 
 ## CI/CD
 
