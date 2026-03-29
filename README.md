@@ -1,12 +1,12 @@
 # nominmaxable
 
-Small static site that reads the public parkrun events GeoJSON, caches it in your browser for seven days, and reports the **longest** and **shortest** `EventLongName` values (by JavaScript string length after trimming) **per event series** and **per country**, plus **global** extremes within each series. Tables include **character count** columns next to each EventLongName list (one count per cell; tied names share the same length). **Column headers** are **buttons**: click or press **Enter** / **Space** to sort **ascending** first; activate the **same** column again to **reverse** order. **`aria-sort`** reflects the active column for assistive tech.
+Small static site that reads a public JSON listing of parkrun events, caches it in your browser for seven days, and reports the **longest** and **shortest** `EventLongName` values (by JavaScript string length after trimming) **per event series** and **per country**, plus **global** extremes within each series. Tables include **character count** columns next to each EventLongName list (one count per cell; tied names share the same length). **Column headers** are **buttons**: click or press **Enter** / **Space** to sort **ascending** first; activate the **same** column again to **reverse** order. **`aria-sort`** reflects the active column for assistive tech.
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
 **SEO and sharing:** [`src/index.html`](./src/index.html) includes canonical URL, keyword meta, **Open Graph** and **Twitter Card** tags, plus JSON-LD for a **WebApplication** and **BreadcrumbList**. The social preview image lives at [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (1200×630); Vite copies `src/public/` into the build root so it is served as `/nominmaxable/nominmaxable-social-preview.png` on the live site.
 
-The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables.
+The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables. On narrow viewports, wide tables sit in **horizontally scrollable** regions (keyboard-focusable), with **larger sort-button tap targets**, **16px table text**, and **wrapped** long names so cells stay readable.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ On **push** to `main` only, the workflow also **deploys** the `dist/` artefact t
 
 ## Data and caching
 
-- Source: `https://images.parkrun.com/events.json`
+- The fetch URL is configured in [`src/constants.ts`](./src/constants.ts) (not repeated in user-facing copy).
 - Cached under the key `parkrun.nominmaxable.events` with a versioned wrapper `{ v, fetchedAt, body }` where `body` is the raw response text.
 - If the cache is older than seven days, the app fetches again on load. If a refresh fails but a previous payload exists, stale data is shown with a warning.
 

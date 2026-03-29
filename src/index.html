@@ -8,7 +8,7 @@
     <title>nominmaxable | johnsy.com</title>
     <meta
       name="description"
-      content="Explore longest and shortest parkrun EventLongName values by series and country, using cached parkrun events data."
+      content="Explore longest and shortest parkrun EventLongName values by series and country. Data is cached in your browser for seven days."
     />
     <link rel="canonical" href="https://www.johnsy.com/nominmaxable/" />
     <meta name="author" content="Pete Johns" />
@@ -21,7 +21,7 @@
     <meta property="og:title" content="nominmaxable | johnsy.com" />
     <meta
       property="og:description"
-      content="Explore longest and shortest parkrun EventLongName values by series and country, using cached parkrun events data."
+      content="Explore longest and shortest parkrun EventLongName values by series and country. Data is cached in your browser for seven days."
     />
     <meta property="og:url" content="https://www.johnsy.com/nominmaxable/" />
     <meta
@@ -45,7 +45,7 @@
     <meta name="twitter:title" content="nominmaxable | johnsy.com" />
     <meta
       name="twitter:description"
-      content="Explore longest and shortest parkrun EventLongName values by series and country, using cached parkrun events data."
+      content="Explore longest and shortest parkrun EventLongName values by series and country. Data is cached in your browser for seven days."
     />
     <meta
       name="twitter:image"
@@ -60,7 +60,7 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "nominmaxable",
-        "description": "Explore longest and shortest parkrun EventLongName values by event series and country using cached public parkrun events data.",
+        "description": "Explore longest and shortest parkrun EventLongName values by event series and country. Data is drawn from a public listing and cached in your browser.",
         "url": "https://www.johnsy.com/nominmaxable/",
         "image": "https://www.johnsy.com/nominmaxable/nominmaxable-social-preview.png",
         "applicationCategory": "UtilitiesApplication",
@@ -166,8 +166,8 @@
 
       <main id="content" role="main" aria-busy="false">
         <p class="intro">
-          Longest and shortest <code>EventLongName</code> strings (by character count) from the
-          public parkrun events feed, grouped by event series and country.
+          Longest and shortest <code>EventLongName</code> strings (by character count) from
+          parkrun's public event listing, grouped by event series and country.
         </p>
         <div class="toolbar">
           <button type="button" id="btn-refresh" class="button">Refresh data</button>
@@ -187,9 +187,7 @@
         volunteers
       </p>
       <p>
-        Data from
-        <a href="https://images.parkrun.com/events.json">images.parkrun.com/events.json</a>
-        (cached in your browser for seven days). Published at
+        Data is fetched from a public source and cached in your browser for seven days. Published at
         <a href="https://www.johnsy.com/nominmaxable/">johnsy.com/nominmaxable</a>, built with
         <a href="https://vite.dev/">Vite</a>.
       </p>

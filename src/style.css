@@ -329,10 +329,28 @@ a {
   font-weight: 700;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  margin-bottom: 0.25rem;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid var(--parkrun-focus-ring);
+  outline-offset: 2px;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  min-width: 42rem;
+}
+
+.data-table--compact {
+  min-width: 20rem;
 }
 
 .data-table th,
@@ -341,6 +359,8 @@ a {
   padding: 0.55rem 0.65rem;
   vertical-align: top;
   text-align: left;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .data-table thead th {
@@ -370,6 +390,42 @@ a {
 .sort-header-btn:focus-visible {
   outline: 2px solid var(--parkrun-focus-ring);
   outline-offset: 2px;
+}
+
+@media (max-width: 42rem) {
+  #page {
+    padding: 1.25rem 1rem;
+  }
+
+  #content {
+    padding: 1.25rem;
+  }
+
+  .series-section {
+    padding: 1rem;
+  }
+
+  .data-table {
+    font-size: 1rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.55rem;
+  }
+
+  .data-table--sortable thead th {
+    padding: 0.25rem 0.35rem;
+  }
+
+  .sort-header-btn {
+    min-height: 2.75rem;
+    padding: 0.35rem 0.2rem;
+  }
+
+  .name-list {
+    padding-left: 1rem;
+  }
 }
 
 th[aria-sort="ascending"] .sort-header-btn::after {

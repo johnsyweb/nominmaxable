@@ -11,6 +11,16 @@ import {
 
 const usedHeadingIds = new Set<string>();
 
+function wrapInTableScroll(table: HTMLTableElement, ariaLabel: string): HTMLElement {
+  const wrap = document.createElement("div");
+  wrap.className = "table-scroll";
+  wrap.setAttribute("role", "region");
+  wrap.setAttribute("aria-label", ariaLabel);
+  wrap.tabIndex = 0;
+  wrap.appendChild(table);
+  return wrap;
+}
+
 function hostnameFromUrl(url: string): string {
   try {
     return new URL(url).host;
@@ -326,7 +336,12 @@ function renderGlobalSection(block: SeriesBlock, collator: Intl.Collator): HTMLE
   fillGlobalTbody(tbody, sortGlobalRows(initialGlobal, "measure", 1, collator));
   table.appendChild(tbody);
   wireGlobalTableSort(table, tbody, initialGlobal, collator);
-  wrap.appendChild(table);
+  wrap.appendChild(
+    wrapInTableScroll(
+      table,
+      `Global results for ${block.title}. Scroll horizontally to view all columns.`
+    )
+  );
   return wrap;
 }
 
@@ -352,7 +367,12 @@ export function renderSeriesBlocks(container: HTMLElement, blocks: SeriesBlock[]
     const h4Country = document.createElement("h4");
     h4Country.textContent = "Per country";
     section.appendChild(h4Country);
-    section.appendChild(renderCountryTable(block, collator));
+    section.appendChild(
+      wrapInTableScroll(
+        renderCountryTable(block, collator),
+        `Per country results for ${block.title}. Scroll horizontally to view all columns.`
+      )
+    );
     const h4Global = document.createElement("h4");
     h4Global.textContent = "Global";
     section.appendChild(h4Global);
