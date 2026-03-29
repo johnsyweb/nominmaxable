@@ -346,6 +346,40 @@ a {
 .data-table thead th {
   background: var(--parkrun-table-header);
   font-weight: 700;
+  vertical-align: bottom;
+}
+
+.data-table--sortable thead th {
+  padding: 0.35rem 0.45rem;
+}
+
+.sort-header-btn {
+  font: inherit;
+  font-weight: 700;
+  margin: 0;
+  padding: 0.2rem 0.15rem;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.sort-header-btn:focus-visible {
+  outline: 2px solid var(--parkrun-focus-ring);
+  outline-offset: 2px;
+}
+
+th[aria-sort="ascending"] .sort-header-btn::after {
+  content: " ▲";
+  font-size: 0.72em;
+}
+
+th[aria-sort="descending"] .sort-header-btn::after {
+  content: " ▼";
+  font-size: 0.72em;
 }
 
 .data-table tbody tr:nth-child(even) {
