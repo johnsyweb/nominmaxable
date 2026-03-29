@@ -4,6 +4,8 @@ Small static site that reads the public parkrun events GeoJSON, caches it in you
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
+**SEO and sharing:** [`src/index.html`](./src/index.html) includes canonical URL, keyword meta, **Open Graph** and **Twitter Card** tags, plus JSON-LD for a **WebApplication** and **BreadcrumbList**. The social preview image lives at [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (1200×630); Vite copies `src/public/` into the build root so it is served as `/nominmaxable/nominmaxable-social-preview.png` on the live site.
+
 The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables.
 
 ## Requirements
