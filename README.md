@@ -4,7 +4,7 @@ Small static site that reads the public parkrun events GeoJSON, caches it in you
 
 Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
 
-Visual design follows the same **parkrun palette** (aubergine, apricot, greys) and **Atkinson Hyperlegible** typefaces as sibling tools such as [Ambassy](https://www.johnsy.com/ambassy/), with reading-width layout (`65ch`) for header and footer prose and a wider column for data tables.
+The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables.
 
 ## Requirements
 

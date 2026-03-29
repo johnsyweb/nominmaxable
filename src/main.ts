@@ -79,7 +79,7 @@ function clearResults(): void {
 }
 
 async function runFetch(cached: ReturnType<typeof readCache>): Promise<void> {
-  const main = requireElement("main-content");
+  const main = requireElement("content");
   setBusy(main, true);
   announcePolite("Loading event data");
   try {

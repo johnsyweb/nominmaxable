@@ -1,4 +1,39 @@
-/* parkrun colour palette — shared with ambassy, eventuate, foretoken, pr-by-pt */
+/* Atkinson Hyperlegible — same sources as Eventuate (johnsy.com) */
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("https://www.johnsy.com/assets/fonts/Atkinson-Hyperlegible-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("https://www.johnsy.com/assets/fonts/Atkinson-Hyperlegible-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("https://www.johnsy.com/assets/fonts/Atkinson-Hyperlegible-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("https://www.johnsy.com/assets/fonts/Atkinson-Hyperlegible-BoldItalic.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* parkrun colour palette — shared with Eventuate docs */
 :root {
   --parkrun-aubergine: #4c1a57;
   --parkrun-apricot: #f7a541;
@@ -10,7 +45,6 @@
   --parkrun-table-border: #dddddd;
   --parkrun-table-stripe: #f9f9f9;
   --parkrun-focus-ring: #4a90e2;
-  --parkrun-link-underline: #bbdefb;
 }
 
 *,
@@ -20,45 +54,24 @@
 }
 
 body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
   margin: 0;
-  background: var(--parkrun-light-grey);
-  color: var(--parkrun-black);
   font-family:
     "Atkinson Hyperlegible",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
-    Roboto,
+    "Roboto",
     sans-serif;
   font-size: 15px;
   line-height: 1.7;
-  font-size-adjust: 0.52;
+  color: var(--parkrun-black);
+  background: var(--parkrun-light-grey);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: var(--parkrun-aubergine);
   text-decoration: none;
-  border-bottom: 1px solid var(--parkrun-link-underline);
-  padding-bottom: 2px;
-}
-
-a:hover {
-  background-color: #e3f2fd;
-  color: #0d47a1;
-}
-
-a:focus-visible {
-  outline: 2px solid var(--parkrun-focus-ring);
-  outline-offset: 2px;
-}
-
-.site-header .breadcrumbs a,
-.site-footer a,
-.data-table a {
-  border-bottom-color: var(--parkrun-link-underline);
 }
 
 .skip-link {
@@ -71,15 +84,9 @@ a:focus-visible {
   border-radius: 6px;
   font-weight: 600;
   text-decoration: none;
-  border: none;
   transform: translateY(-200%);
   transition: transform 0.2s ease;
   z-index: 1000;
-}
-
-.skip-link:hover {
-  background: var(--parkrun-apricot);
-  color: var(--parkrun-black);
 }
 
 .skip-link:focus,
@@ -101,16 +108,30 @@ a:focus-visible {
   border: 0;
 }
 
-.site-header {
-  border-bottom: 1px solid var(--parkrun-table-border);
-  background: var(--parkrun-white);
+/* Full-width header/footer (matches Eventuate docs) */
+#header,
+#footer {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
 }
 
-.site-header__inner {
-  max-width: 65ch;
-  width: 100%;
-  margin: 0 auto;
-  padding: 1rem 10px 1.25rem;
+#header {
+  background-color: var(--parkrun-aubergine);
+  color: var(--parkrun-white);
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#header h1 {
+  margin: 0.75rem 0 0 0;
+  color: var(--parkrun-white);
+  font-size: clamp(1.75rem, 4vw, 2rem);
+  line-height: 1.2;
 }
 
 .breadcrumbs {
@@ -119,44 +140,111 @@ a:focus-visible {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  margin: 0 0 0.75rem;
+  margin-bottom: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.12);
   padding: 0.35rem 0.6rem;
   border-radius: 999px;
   width: fit-content;
-  background: var(--parkrun-light-grey);
 }
 
 .breadcrumbs a {
-  border: none;
-  padding-bottom: 0;
+  color: var(--parkrun-apricot);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  text-decoration: underline;
+}
+
+.breadcrumbs span[aria-hidden="true"] {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .breadcrumbs span[aria-current="page"] {
+  color: var(--parkrun-white);
   font-weight: 600;
-  color: var(--parkrun-aubergine);
 }
 
-.site-header__title {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 4vw, 2rem);
-  line-height: 1.2;
-  color: var(--parkrun-aubergine);
+#footer {
+  background-color: var(--parkrun-aubergine);
+  color: var(--parkrun-white);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: 2rem;
 }
 
-.site-header__lede {
-  margin: 0;
-  max-width: 65ch;
+#footer a {
+  color: var(--parkrun-apricot);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#footer a:hover,
+#footer a:focus-visible {
+  text-decoration: underline;
+}
+
+#footer a:focus-visible {
+  outline: 2px solid var(--parkrun-apricot);
+  outline-offset: 2px;
+}
+
+#footer p {
+  margin: 0.5rem 0;
+}
+
+#page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: block;
+}
+
+#content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--parkrun-white);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#content a {
+  color: var(--parkrun-aubergine);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+#content a:hover,
+#content a:focus-visible {
+  color: var(--parkrun-apricot);
+}
+
+#content a:focus-visible {
+  outline: 2px solid var(--parkrun-focus-ring);
+  outline-offset: 2px;
+}
+
+.intro {
+  margin: 0 0 1.25rem;
   color: var(--parkrun-grey);
+  max-width: 65ch;
 }
 
 .banner {
-  max-width: min(95vw, 80rem);
-  width: 92%;
-  margin: 1rem auto 0;
+  width: 100%;
+  margin: 0 0 1rem;
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--parkrun-table-border);
   background: var(--parkrun-white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .banner p {
@@ -175,43 +263,43 @@ a:focus-visible {
   color: var(--parkrun-black);
 }
 
-main {
-  flex: 1 0 auto;
-  max-width: min(95vw, 80rem);
-  width: 92%;
-  margin: 0 auto;
-  padding: 1.25rem 10px 3rem;
-}
-
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
   align-items: center;
   margin-bottom: 1.5rem;
-  max-width: 65ch;
 }
 
 .button {
   font: inherit;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 999px;
   border: 2px solid var(--parkrun-aubergine);
   background: var(--parkrun-aubergine);
   color: var(--parkrun-white);
-  padding: 0.55rem 1.1rem;
+  padding: 0.65em 1.75em;
   font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .button:hover {
-  filter: brightness(1.08);
-  background: var(--parkrun-aubergine);
+  background: #3d2f4f;
+  border-color: #3d2f4f;
   color: var(--parkrun-white);
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--parkrun-focus-ring);
+  outline: 3px solid var(--parkrun-apricot);
   outline-offset: 2px;
+}
+
+.button:active {
+  background: #1f1929;
+  border-color: #1f1929;
 }
 
 .last-updated {
@@ -221,11 +309,11 @@ main {
 }
 
 .series-section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   padding: 1.25rem;
-  border: 1px solid var(--parkrun-table-border);
-  border-radius: 6px;
-  background: var(--parkrun-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background: var(--parkrun-light-grey);
 }
 
 .series-section h2 {
@@ -277,11 +365,6 @@ main {
   margin: 0.15rem 0;
 }
 
-.data-table a:focus-visible {
-  outline: 2px solid var(--parkrun-focus-ring);
-  outline-offset: 2px;
-}
-
 .global-block {
   margin-top: 0.25rem;
 }
@@ -291,24 +374,9 @@ main {
   max-width: 65ch;
 }
 
-.site-footer {
-  max-width: 65ch;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 10px 2.5rem;
-  color: var(--parkrun-grey);
-  font-size: 0.85rem;
-}
-
-.site-footer p {
-  margin: 0;
-}
-
 code {
   font:
-    0.85em "Atkinson Hyperlegible Mono",
-    Monaco,
+    0.85em Monaco,
     Courier,
     monospace;
-  font-size-adjust: 0.62;
 }
