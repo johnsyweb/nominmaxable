@@ -50,6 +50,30 @@ export function normalisedCountryCode(value: unknown): string | null {
   return null;
 }
 
+/**
+ * The parkrun events feed often stores country sites as bare hostnames (no scheme).
+ * Without a scheme, `href` is resolved against the page URL and breaks under a subpath deploy.
+ */
+export function normaliseCountrySiteUrl(raw: unknown): string {
+  if (raw === null || raw === undefined) {
+    return "";
+  }
+  if (typeof raw !== "string") {
+    return "";
+  }
+  const t = raw.trim();
+  if (t === "") {
+    return "";
+  }
+  if (/^https?:\/\//i.test(t)) {
+    return t;
+  }
+  if (t.startsWith("//")) {
+    return `https:${t}`;
+  }
+  return `https://${t}`;
+}
+
 export function classifySeriesId(value: unknown): "unknown" | number {
   if (typeof value === "number") {
     if (Number.isInteger(value) && Number.isFinite(value)) {
@@ -128,7 +152,7 @@ function buildCountryRows(
   codes.sort((a, b) => compareCountryCodes(a, b, collator));
   return codes.map((countryCode) => {
     const names = bucket.perCountry.get(countryCode) ?? new Set<string>();
-    const countryUrl = doc.countries[countryCode]?.url ?? "";
+    const countryUrl = normaliseCountrySiteUrl(doc.countries[countryCode]?.url);
     const longest = extremeNames(names, "longest", collator);
     const shortest = extremeNames(names, "shortest", collator);
     return {

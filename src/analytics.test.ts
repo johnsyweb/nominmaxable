@@ -6,6 +6,7 @@ import {
   computeSeriesBlocks,
   createNameCollator,
   extremeNames,
+  normaliseCountrySiteUrl,
   normalisedCountryCode,
   normalisedEventLongName,
   parseParkrunDocument,
@@ -37,6 +38,32 @@ describe("normalisedCountryCode", () => {
     expect(normalisedCountryCode("")).toBeNull();
     expect(normalisedCountryCode("   ")).toBeNull();
     expect(normalisedCountryCode(null)).toBeNull();
+  });
+});
+
+describe("normaliseCountrySiteUrl", () => {
+  it("returns empty for null, undefined, non-strings, and whitespace", () => {
+    expect(normaliseCountrySiteUrl(null)).toBe("");
+    expect(normaliseCountrySiteUrl(undefined)).toBe("");
+    expect(normaliseCountrySiteUrl(1)).toBe("");
+    expect(normaliseCountrySiteUrl("")).toBe("");
+    expect(normaliseCountrySiteUrl("  ")).toBe("");
+  });
+
+  it("prefixes https for bare hostnames from the parkrun feed", () => {
+    expect(normaliseCountrySiteUrl("www.parkrun.com.au")).toBe("https://www.parkrun.com.au");
+    expect(normaliseCountrySiteUrl("  www.parkrun.org.uk ")).toBe("https://www.parkrun.org.uk");
+  });
+
+  it("leaves absolute http(s) URLs unchanged", () => {
+    expect(normaliseCountrySiteUrl("https://www.parkrun.com.au/")).toBe(
+      "https://www.parkrun.com.au/"
+    );
+    expect(normaliseCountrySiteUrl("http://example.test")).toBe("http://example.test");
+  });
+
+  it("upgrades protocol-relative URLs to https", () => {
+    expect(normaliseCountrySiteUrl("//www.parkrun.jp")).toBe("https://www.parkrun.jp");
   });
 });
 
@@ -207,5 +234,25 @@ describe("computeSeriesBlocks", () => {
     };
     const blocks = computeSeriesBlocks(doc, collator);
     expect(blocks.every((b) => !b.isUnknown)).toBe(true);
+  });
+
+  it("normalises bare hostname country URLs so site links are absolute", () => {
+    const doc: ParkrunEventsDocument = {
+      countries: { 97: { url: "www.parkrun.org.uk" } },
+      events: {
+        features: [
+          {
+            properties: {
+              EventLongName: "Example",
+              countrycode: 97,
+              seriesid: 1,
+            },
+          },
+        ],
+      },
+    };
+    const blocks = computeSeriesBlocks(doc, collator);
+    const row = blocks[0]?.countries.find((c) => c.countryCode === "97");
+    expect(row?.countryUrl).toBe("https://www.parkrun.org.uk");
   });
 });

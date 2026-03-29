@@ -1,5 +1,6 @@
 export interface CountryInfo {
-  url: string;
+  /** May be a bare hostname (e.g. `www.parkrun.com.au`) or null in the live feed. */
+  url: string | null;
 }
 
 export interface ParkrunEventsDocument {
