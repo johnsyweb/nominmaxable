@@ -3,6 +3,7 @@ import { isFresh, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
 import { formatLastUpdated } from "./formatLastUpdated";
 import { renderSeriesBlocks } from "./render";
+import { userVisibleErrorDetail } from "./userVisibleErrorDetail";
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -27,11 +28,28 @@ function announcePolite(message: string): void {
 }
 
 async function fetchEventsBody(): Promise<string> {
-  const res = await fetch(EVENTS_JSON_URL);
-  if (!res.ok) {
-    throw new Error(`Could not load event data (${res.status})`);
+  let res: Response;
+  try {
+    res = await fetch(EVENTS_JSON_URL);
+  } catch (err) {
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error(String(err), { cause: err });
   }
-  return await res.text();
+  if (!res.ok) {
+    const statusText = res.statusText?.trim();
+    throw new Error(statusText ? `HTTP ${res.status} (${statusText})` : `HTTP ${res.status}`);
+  }
+  try {
+    return await res.text();
+  } catch (err) {
+    const detail = userVisibleErrorDetail(err);
+    const msg = detail
+      ? `Could not read response body: ${detail}`
+      : "Could not read response body.";
+    throw new Error(msg, { cause: err });
+  }
 }
 
 function setBusy(main: HTMLElement, busy: boolean): void {
@@ -46,11 +64,31 @@ function setStaleVisible(visible: boolean): void {
   requireElement("stale-banner").hidden = !visible;
 }
 
-function setErrorVisible(visible: boolean, message?: string): void {
+function setErrorBannerContent(headline: string, detail: string | null): void {
+  const el = requireElement("error-banner");
+  el.replaceChildren();
+  const p1 = document.createElement("p");
+  p1.textContent = headline;
+  el.appendChild(p1);
+  if (detail) {
+    const p2 = document.createElement("p");
+    p2.className = "banner__detail";
+    p2.textContent = `Details: ${detail}`;
+    el.appendChild(p2);
+  }
+}
+
+function setErrorVisible(visible: false): void;
+function setErrorVisible(visible: true, headline: string, detail?: string | null): void;
+function setErrorVisible(visible: boolean, headline?: string, detail?: string | null): void {
   const el = requireElement("error-banner");
   el.hidden = !visible;
-  if (message !== undefined) {
-    el.textContent = message;
+  if (!visible) {
+    el.replaceChildren();
+    return;
+  }
+  if (headline !== undefined) {
+    setErrorBannerContent(headline, detail ?? null);
   }
 }
 
@@ -66,10 +104,15 @@ function renderFromBody(body: string, context: { stale: boolean; fetchedAt: numb
     );
     setStaleVisible(context.stale);
     setErrorVisible(false);
-  } catch {
+  } catch (err) {
     clearResults();
     setStaleVisible(false);
-    setErrorVisible(true, "Could not read event data. Use Refresh data to download a fresh copy.");
+    const detail = userVisibleErrorDetail(err);
+    setErrorVisible(
+      true,
+      "Could not read event data. Use Refresh data to download a fresh copy.",
+      detail
+    );
   }
 }
 
@@ -87,15 +130,17 @@ async function runFetch(cached: ReturnType<typeof readCache>): Promise<void> {
     const fetchedAt = Date.now();
     writeCache({ fetchedAt, body });
     renderFromBody(body, { stale: false, fetchedAt });
-  } catch {
+  } catch (err) {
     if (cached?.body) {
       renderFromBody(cached.body, { stale: true, fetchedAt: cached.fetchedAt });
     } else {
       clearResults();
       setStaleVisible(false);
+      const detail = userVisibleErrorDetail(err);
       setErrorVisible(
         true,
-        "Could not load event data. Check your connection, then use Refresh data to try again."
+        "Could not load event data. Check your connection, then use Refresh data to try again.",
+        detail
       );
     }
   } finally {

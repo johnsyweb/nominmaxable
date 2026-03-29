@@ -263,6 +263,13 @@ a {
   color: var(--parkrun-black);
 }
 
+.banner__detail {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--parkrun-grey);
+  word-break: break-word;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
