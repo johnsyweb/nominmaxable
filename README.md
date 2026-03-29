@@ -25,6 +25,18 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 | `pnpm format:check` | Prettier check                        |
 | `pnpm precommit`  | Format check, lint, typecheck, build, tests |
 
+## CI/CD
+
+[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** and **pull request** to `main`:
+
+1. Installs **Node** and **pnpm** via [mise](https://mise.jdx.dev/) using [`.tool-versions`](./.tool-versions) (same as local development).
+2. Runs **`pnpm install --frozen-lockfile`** with **`HUSKY=0`** so Husky does not run in CI.
+3. Runs **`pnpm run precommit`** (Prettier check, ESLint, TypeScript, production build, Vitest).
+
+On **push** to `main` only, the workflow also **deploys** the `dist/` artefact to **GitHub Pages** (configure the repository: **Settings → Pages → Build and deployment → GitHub Actions**). The site is built with `base: '/nominmaxable/'`, which matches a project published at `https://<user>.github.io/nominmaxable/` when the repository name is `nominmaxable`. If you only publish to **johnsy.com**, you can ignore GitHub Pages or remove the `deploy` job.
+
+[Dependabot](.github/dependabot.yml) opens weekly PRs for **npm** and **GitHub Actions** updates.
+
 ## Data and caching
 
 - Source: `https://images.parkrun.com/events.json`
