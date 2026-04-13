@@ -4,7 +4,7 @@
   "description": "parkrun full event name length analysis by series and country",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && node scripts/update-sitemap-lastmod.mjs",
     "dev": "vite",
     "preview": "vite preview",
     "test": "vitest",

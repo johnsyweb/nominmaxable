@@ -18,7 +18,7 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 | Script            | Purpose                                  |
 | ----------------- | ---------------------------------------- |
 | `pnpm dev`        | Local development server                 |
-| `pnpm build`      | Production build to `dist/`              |
+| `pnpm build`      | Production build to `dist/` and stamp `sitemap.xml` with today’s date |
 | `pnpm preview`    | Preview the production build             |
 | `pnpm test:run`   | Unit tests (Vitest, Node environment)    |
 | `pnpm lint`       | ESLint                                   |
@@ -30,13 +30,13 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 
 ## CI/CD
 
-[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** (any branch) and on **pull requests**:
+[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** (any branch), on **pull requests**, and once daily at **06:00 UTC**:
 
 1. Installs **Node** and **pnpm** via [mise](https://mise.jdx.dev/) using [`.tool-versions`](./.tool-versions) (same as local development).
 2. Runs **`pnpm install --frozen-lockfile`** with **`HUSKY=0`** so Husky does not run in CI.
 3. Runs **`pnpm run precommit`** (Prettier check, ESLint, TypeScript, production build, Vitest).
 
-On **push** to `main` only, the workflow also **deploys** the `dist/` artefact to **GitHub Pages** (configure the repository: **Settings → Pages → Build and deployment → GitHub Actions**). The site is built with `base: '/nominmaxable/'`, which matches a project published at `https://<user>.github.io/nominmaxable/` when the repository name is `nominmaxable`. If you only publish to **johnsy.com**, you can ignore GitHub Pages or remove the `deploy` job.
+On **push** to `main` and on the daily scheduled run, the workflow also **deploys** the `dist/` artefact to **GitHub Pages** (configure the repository: **Settings → Pages → Build and deployment → GitHub Actions**). The build copies [`src/public/sitemap.xml`](./src/public/sitemap.xml) into the output and rewrites its **`<lastmod>`** value to the build date, so each deployment publishes a fresh sitemap. The site is built with `base: '/nominmaxable/'`, which matches a project published at `https://<user>.github.io/nominmaxable/` when the repository name is `nominmaxable`. If you only publish to **johnsy.com**, you can ignore GitHub Pages or remove the `deploy` job.
 
 [Dependabot](.github/dependabot.yml) opens weekly PRs for **npm** and **GitHub Actions** updates.
 
