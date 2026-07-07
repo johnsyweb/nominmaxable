@@ -2,12 +2,7 @@ import { compareCountryCodes } from "./analytics";
 import type { CountryRow, SeriesBlock } from "./types";
 
 export type CountrySortColumn =
-  | "country"
-  | "site"
-  | "longestNames"
-  | "longestCount"
-  | "shortestNames"
-  | "shortestCount";
+  "country" | "site" | "longestNames" | "longestCount" | "shortestNames" | "shortestCount";
 
 export type GlobalSortColumn = "measure" | "names" | "count";
 
