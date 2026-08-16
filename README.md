@@ -38,7 +38,7 @@ The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate
 
 On **push** to `main` and on the daily scheduled run, the workflow also **deploys** the `dist/` artefact to **GitHub Pages** (configure the repository: **Settings → Pages → Build and deployment → GitHub Actions**). The build copies [`src/public/sitemap.xml`](./src/public/sitemap.xml) into the output and rewrites its **`<lastmod>`** value to the build date, so each deployment publishes a fresh sitemap. The site is built with `base: '/nominmaxable/'`, which matches a project published at `https://<user>.github.io/nominmaxable/` when the repository name is `nominmaxable`. If you only publish to **johnsy.com**, you can ignore GitHub Pages or remove the `deploy` job.
 
-[Dependabot](.github/dependabot.yml) opens weekly PRs for **npm** and **GitHub Actions** updates.
+[Dependabot](.github/dependabot.yml) opens **weekly (Monday)** PRs for **npm** and **GitHub Actions** updates, with **grouped** minor/patch PRs (linting, testing, build, TypeScript, Actions) and conventional commit prefixes (`deps` / `deps-dev` / `ci`). Major npm updates stay ungrouped so they can be reviewed individually. [Auto-merge](.github/workflows/dependabot-auto-merge.yml) enables merge for Dependabot PRs after checks pass.
 
 ## Data and caching
 
