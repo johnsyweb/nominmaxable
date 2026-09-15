@@ -1,3 +1,8 @@
+import {
+  analysisViewFromSearchParams,
+  applyAnalysisViewToSearchParams,
+  type AnalysisView,
+} from "./analysisView";
 import { computeSeriesBlocks, createNameCollator, parseParkrunDocument } from "./analytics";
 import { isFresh, isQuotaExceededError, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
@@ -7,8 +12,6 @@ import { renderSeriesBlocks } from "./render";
 import { renderIsolationSeriesBlocks } from "./renderIsolation";
 import type { ParkrunEventsDocument } from "./types";
 import { userVisibleErrorDetail } from "./userVisibleErrorDetail";
-
-type AnalysisView = "names" | "isolation";
 
 const INTRO_NAMES =
   "Longest and shortest full event name strings (by character count) from parkrun's public event listing, grouped by event series and country.";
@@ -25,7 +28,9 @@ function requireElement(id: string): HTMLElement {
 
 let politeClearTimer: number | undefined;
 let currentDoc: ParkrunEventsDocument | null = null;
-let analysisView: AnalysisView = "names";
+let analysisView: AnalysisView = analysisViewFromSearchParams(
+  new URLSearchParams(window.location.search)
+);
 
 function announcePolite(message: string): void {
   const el = requireElement("sr-polite");
@@ -211,11 +216,24 @@ async function bootstrap(): Promise<void> {
   await runFetch(cached);
 }
 
-function setAnalysisView(view: AnalysisView): void {
+function syncAnalysisViewToUrl(view: AnalysisView): void {
+  const url = new URL(window.location.href);
+  applyAnalysisViewToSearchParams(url.searchParams, view);
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (next !== current) {
+    history.pushState({ analysisView: view }, "", next);
+  }
+}
+
+function setAnalysisView(view: AnalysisView, options?: { syncUrl?: boolean }): void {
   if (analysisView === view) {
     return;
   }
   analysisView = view;
+  if (options?.syncUrl !== false) {
+    syncAnalysisViewToUrl(view);
+  }
   renderAnalysisResults();
   announcePolite(
     view === "names"
@@ -235,6 +253,11 @@ function init(): void {
   });
   requireElement("view-isolation").addEventListener("click", () => {
     setAnalysisView("isolation");
+  });
+
+  window.addEventListener("popstate", () => {
+    const fromUrl = analysisViewFromSearchParams(new URLSearchParams(window.location.search));
+    setAnalysisView(fromUrl, { syncUrl: false });
   });
 
   updateViewSwitchUi();

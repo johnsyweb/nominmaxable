@@ -9,7 +9,7 @@ Volunteer-facing utility: it reads a public JSON listing of parkrun events, cach
 
 ## Getting started
 
-Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, switch between **Full event name lengths** and **Nearest-neighbour isolation**, then sort columns with the header buttons (Enter or Space).
+Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, switch between **Full event name lengths** and **Nearest-neighbour isolation**, then sort columns with the header buttons (Enter or Space). Deep-link the isolation view with [`?view=isolation`](https://www.johnsy.com/nominmaxable/?view=isolation); the name-length view is the default (or use `?view=names`).
 
 ## Help
 
@@ -34,15 +34,15 @@ pnpm exec playwright install chromium   # once, for screenshots only
 pnpm dev
 ```
 
-| Script | Purpose |
-| --- | --- |
-| `pnpm dev` | Local development server |
-| `pnpm build` | Production build to `dist/` and stamp `sitemap.xml` |
-| `pnpm preview` | Preview the production build |
-| `pnpm test:run` | Unit tests (Vitest) |
-| `pnpm lint` / `pnpm typecheck` / `pnpm format` | Quality tools |
-| `pnpm precommit` | Format check, lint, typecheck, build, tests |
-| `pnpm screenshots` | Regenerate [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) |
+| Script                                         | Purpose                                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                                     | Local development server                                                                                |
+| `pnpm build`                                   | Production build to `dist/` and stamp `sitemap.xml`                                                     |
+| `pnpm preview`                                 | Preview the production build                                                                            |
+| `pnpm test:run`                                | Unit tests (Vitest)                                                                                     |
+| `pnpm lint` / `pnpm typecheck` / `pnpm format` | Quality tools                                                                                           |
+| `pnpm precommit`                               | Format check, lint, typecheck, build, tests                                                             |
+| `pnpm screenshots`                             | Regenerate [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) |
 
 Husky runs `mise exec -- pnpm run precommit` on commit when mise is available. Set `HUSKY=0` in CI.
 
