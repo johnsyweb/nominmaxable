@@ -3,6 +3,7 @@
 Reports the longest and shortest parkrun full event names by series and country.
 
 [![CI/CD](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml)
+[![Licence: MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](./LICENSE)
 
 Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and shows length extremes (character count after trimming) per event series, per country, and globally. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
 
@@ -60,3 +61,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/). Keep changes s
 On **push** to `main` and on the scheduled run, `dist/` deploys to **GitHub Pages** (`base: '/nominmaxable/'`). The build rewrites `sitemap.xml` `<lastmod>` to the build date. The primary site is [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/); GitHub Pages is optional if you only publish there.
 
 [Dependabot](.github/dependabot.yml) opens weekly (Monday) grouped minor/patch PRs for npm and GitHub Actions (`deps` / `deps-dev` / `ci` prefixes). Majors stay ungrouped. [Auto-merge](.github/workflows/dependabot-auto-merge.yml) merges Dependabot PRs after checks pass.
+
+## Licence
+
+[MIT](./LICENSE).
