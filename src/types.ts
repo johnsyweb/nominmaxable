@@ -12,6 +12,10 @@ export interface ParkrunEventsDocument {
 
 export interface Feature {
   properties?: Record<string, unknown>;
+  geometry?: {
+    type?: string;
+    coordinates?: unknown;
+  };
 }
 
 export interface CountryRow {
