@@ -237,6 +237,39 @@ a {
   max-width: 65ch;
 }
 
+.view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.view-switch__btn {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 2px solid var(--parkrun-aubergine);
+  background: var(--parkrun-white);
+  color: var(--parkrun-aubergine);
+  padding: 0.45em 1.1em;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.view-switch__btn[aria-pressed="true"] {
+  background: var(--parkrun-aubergine);
+  color: var(--parkrun-white);
+}
+
+.view-switch__btn:focus-visible {
+  outline: 3px solid var(--parkrun-apricot);
+  outline-offset: 2px;
+}
+
+.view-switch__btn:hover {
+  border-color: #3d2f4f;
+}
+
 .banner {
   width: 100%;
   margin: 0 0 1rem;
@@ -464,8 +497,14 @@ th[aria-sort="descending"] .sort-header-btn::after {
   padding-left: 1.15rem;
 }
 
-.name-list li {
-  margin: 0.15rem 0;
+.country-flag {
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+.name-list--flags {
+  list-style: none;
+  padding-left: 0;
 }
 
 .global-block {
