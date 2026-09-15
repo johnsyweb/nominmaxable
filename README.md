@@ -1,15 +1,15 @@
 # nominmaxable
 
-Reports the longest and shortest parkrun full event names by series and country.
+Reports the longest and shortest parkrun full event names — and nearest-neighbour isolation — by series and country.
 
 [![CI/CD](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml)
 [![Licence: MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](./LICENSE)
 
-Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and shows length extremes (character count after trimming) per event series, per country, and globally. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
+Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and offers two analyses (switchable in the UI): **full event name** length extremes, and **nearest-neighbour isolation** (haversine distance in kilometres to the nearest other event in the same series, any country). Both are shown per event series, per country, and globally. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
 
 ## Getting started
 
-Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, then sort columns with the header buttons (Enter or Space).
+Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, switch between **Full event name lengths** and **Nearest-neighbour isolation**, then sort columns with the header buttons (Enter or Space).
 
 ## Help
 
@@ -46,7 +46,7 @@ pnpm dev
 
 Husky runs `mise exec -- pnpm run precommit` on commit when mise is available. Set `HUSKY=0` in CI.
 
-**Data:** the fetch URL lives in [`src/constants.ts`](./src/constants.ts). The payload is stored in `localStorage` under `parkrun.nominmaxable.events` as `{ v, fetchedAt, body }` for seven days. Quota failures still show freshly downloaded data with a status note; failed refresh with an older cache shows a stale warning; load/parse failures may include a **Details** line.
+**Data:** the fetch URL lives in [`src/constants.ts`](./src/constants.ts). The payload is stored in `localStorage` under `parkrun.nominmaxable.events` as `{ v, fetchedAt, body }` for seven days. Quota failures still show freshly downloaded data with a status note; failed refresh with an older cache shows a stale warning; load/parse failures may include a **Details** line. Isolation analysis reads GeoJSON `Point` coordinates (`[longitude, latitude]`); events without valid coordinates are omitted.
 
 **SEO:** [`src/index.html`](./src/index.html) carries canonical, Open Graph, Twitter Card, and JSON-LD tags. The social image is 1200×630 at `src/public/nominmaxable-social-preview.png` (refreshed via `pnpm screenshots`).
 
