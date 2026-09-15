@@ -1,53 +1,62 @@
 # nominmaxable
 
-Small static site that reads a public JSON listing of parkrun events, caches it in your browser for seven days, and reports the **longest** and **shortest** full event names (by JavaScript string length after trimming) **per event series** and **per country**, plus **global** extremes within each series. Tables include **character count** columns next to each full event name list (one count per cell; tied names share the same length). **Column headers** are **buttons**: click or press **Enter** / **Space** to sort **ascending** first; activate the **same** column again to **reverse** order. **`aria-sort`** reflects the active column for assistive tech.
+Reports the longest and shortest parkrun full event names by series and country.
 
-Deployed at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/).
+[![CI/CD](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml)
 
-**SEO and sharing:** [`src/index.html`](./src/index.html) includes canonical URL, keyword meta, **Open Graph** and **Twitter Card** tags, plus JSON-LD for a **WebApplication** and **BreadcrumbList**. The social preview image lives at [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (1200×630); Vite copies `src/public/` into the build root so it is served as `/nominmaxable/nominmaxable-social-preview.png` on the live site. After changing visible copy, run **`pnpm run screenshots`** to rebuild, start a temporary preview on a free port, and overwrite that PNG (requires a one-time **`pnpm exec playwright install chromium`** after `pnpm install`).
+Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and shows length extremes (character count after trimming) per event series, per country, and globally. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
 
-The **header** and **footer** match [Eventuate](https://www.johnsy.com/eventuate/) (full-width aubergine bars, breadcrumb pill, centred footer links in apricot). **Atkinson Hyperlegible** is loaded from the same **johnsy.com** font assets as Eventuate. The main block uses Eventuate’s **white card** (`#page` / `#content`) pattern for the interactive area and tables. On narrow viewports, wide tables sit in **horizontally scrollable** regions (keyboard-focusable), with **larger sort-button tap targets**, **16px table text**, and **wrapped** long names so cells stay readable.
+## Getting started
 
-## Requirements
+Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, then sort columns with the header buttons (Enter or Space).
 
-- [mise](https://mise.jdx.dev/) with the versions in [`.tool-versions`](./.tool-versions) (run `mise install` in this directory)
-- [pnpm](https://pnpm.io/) (see `packageManager` in `package.json`; mise provides the matching version). Husky’s pre-commit hook runs `mise exec -- pnpm run precommit` when `mise` is available.
+## Help
 
-## Scripts
+Open an [issue](https://github.com/johnsyweb/nominmaxable/issues) on GitHub.
 
-| Script            | Purpose                                  |
-| ----------------- | ---------------------------------------- |
-| `pnpm dev`        | Local development server                 |
-| `pnpm build`      | Production build to `dist/` and stamp `sitemap.xml` with today’s date |
-| `pnpm preview`    | Preview the production build             |
-| `pnpm test:run`   | Unit tests (Vitest, Node environment)    |
-| `pnpm lint`       | ESLint                                   |
-| `pnpm typecheck`  | TypeScript `--noEmit`                    |
-| `pnpm format`     | Prettier write                           |
-| `pnpm format:check` | Prettier check                        |
-| `pnpm precommit`  | Format check, lint, typecheck, build, tests |
-| `pnpm screenshots` | Regenerate [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) (Playwright; needs `pnpm exec playwright install chromium` once) |
+## Maintainers
 
-## CI/CD
+[Pete Johns](https://www.johnsy.com/) ([@johnsyweb](https://github.com/johnsyweb)). Contributions from parkrun volunteers are welcome. Not affiliated with parkrun Limited.
 
-[GitHub Actions](.github/workflows/ci-cd.yml) runs on every **push** (any branch), on **pull requests**, and once daily at **06:00 UTC**:
+## Development status
 
-1. Installs **Node** and **pnpm** via [mise](https://mise.jdx.dev/) using [`.tool-versions`](./.tool-versions) (same as local development).
-2. Runs **`pnpm install --frozen-lockfile`** with **`HUSKY=0`** so Husky does not run in CI.
-3. Runs **`pnpm run precommit`** (Prettier check, ESLint, TypeScript, production build, Vitest).
+Maintained. Version **1.0.0** (`package.json`).
 
-On **push** to `main` and on the daily scheduled run, the workflow also **deploys** the `dist/` artefact to **GitHub Pages** (configure the repository: **Settings → Pages → Build and deployment → GitHub Actions**). The build copies [`src/public/sitemap.xml`](./src/public/sitemap.xml) into the output and rewrites its **`<lastmod>`** value to the build date, so each deployment publishes a fresh sitemap. The site is built with `base: '/nominmaxable/'`, which matches a project published at `https://<user>.github.io/nominmaxable/` when the repository name is `nominmaxable`. If you only publish to **johnsy.com**, you can ignore GitHub Pages or remove the `deploy` job.
+## Local development
 
-[Dependabot](.github/dependabot.yml) opens **weekly (Monday)** PRs for **npm** and **GitHub Actions** updates, with **grouped** minor/patch PRs (linting, testing, build, TypeScript, Actions) and conventional commit prefixes (`deps` / `deps-dev` / `ci`). Major npm updates stay ungrouped so they can be reviewed individually. [Auto-merge](.github/workflows/dependabot-auto-merge.yml) enables merge for Dependabot PRs after checks pass.
+Requires [mise](https://mise.jdx.dev/) (see [`.tool-versions`](./.tool-versions)) and [pnpm](https://pnpm.io/) (see `packageManager` in `package.json`).
 
-## Data and caching
+```bash
+mise install
+pnpm install
+pnpm exec playwright install chromium   # once, for screenshots only
+pnpm dev
+```
 
-- The fetch URL is configured in [`src/constants.ts`](./src/constants.ts) (not repeated in user-facing copy).
-- Cached under the key `parkrun.nominmaxable.events` with a versioned wrapper `{ v, fetchedAt, body }` where `body` is the raw response text (stored in **`localStorage`** for this origin).
-- If **`localStorage`** hits the browser’s **per-origin quota**, `setItem` throws a `QuotaExceededError` (message is often “The quota has been exceeded.”). The app still **shows the freshly downloaded data** and explains in the status line that a local copy could not be saved.
-- If the cache is older than seven days, the app fetches again on load. If a refresh fails but a previous payload exists, stale data is shown with a warning.
-- If there is no usable cache and a fetch fails, the error banner shows a short **Details** line when available (for example **HTTP status** text from the server or the browser’s **network error** message). The same pattern applies when cached or downloaded data **cannot be parsed**.
+| Script | Purpose |
+| --- | --- |
+| `pnpm dev` | Local development server |
+| `pnpm build` | Production build to `dist/` and stamp `sitemap.xml` |
+| `pnpm preview` | Preview the production build |
+| `pnpm test:run` | Unit tests (Vitest) |
+| `pnpm lint` / `pnpm typecheck` / `pnpm format` | Quality tools |
+| `pnpm precommit` | Format check, lint, typecheck, build, tests |
+| `pnpm screenshots` | Regenerate [`src/public/nominmaxable-social-preview.png`](./src/public/nominmaxable-social-preview.png) |
 
-## Licence
+Husky runs `mise exec -- pnpm run precommit` on commit when mise is available. Set `HUSKY=0` in CI.
 
-MIT. Not affiliated with parkrun Limited.
+**Data:** the fetch URL lives in [`src/constants.ts`](./src/constants.ts). The payload is stored in `localStorage` under `parkrun.nominmaxable.events` as `{ v, fetchedAt, body }` for seven days. Quota failures still show freshly downloaded data with a status note; failed refresh with an older cache shows a stale warning; load/parse failures may include a **Details** line.
+
+**SEO:** [`src/index.html`](./src/index.html) carries canonical, Open Graph, Twitter Card, and JSON-LD tags. The social image is 1200×630 at `src/public/nominmaxable-social-preview.png` (refreshed via `pnpm screenshots`).
+
+## Contributing
+
+Use [Conventional Commits](https://www.conventionalcommits.org/). Keep changes small and atomic. Pre-commit must pass format, lint, typecheck, build, and tests.
+
+## Releasing
+
+[CI/CD](.github/workflows/ci-cd.yml) runs on every push, every pull request, and on a schedule (**06:00 UTC Tuesdays**), plus `workflow_dispatch`. It installs with mise, runs `pnpm install --frozen-lockfile` (`HUSKY=0`), then `pnpm run precommit`.
+
+On **push** to `main` and on the scheduled run, `dist/` deploys to **GitHub Pages** (`base: '/nominmaxable/'`). The build rewrites `sitemap.xml` `<lastmod>` to the build date. The primary site is [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/); GitHub Pages is optional if you only publish there.
+
+[Dependabot](.github/dependabot.yml) opens weekly (Monday) grouped minor/patch PRs for npm and GitHub Actions (`deps` / `deps-dev` / `ci` prefixes). Majors stay ungrouped. [Auto-merge](.github/workflows/dependabot-auto-merge.yml) merges Dependabot PRs after checks pass.
