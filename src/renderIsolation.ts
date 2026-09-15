@@ -66,10 +66,32 @@ function appendExtremeNeighbourCountries(
   cell: HTMLTableCellElement,
   events: IsolationEventExtreme[]
 ): void {
-  appendNameList(
-    cell,
-    events.map((e) => e.neighbourCountryCode)
-  );
+  if (events.length === 0) {
+    cell.textContent = "—";
+    return;
+  }
+  const ul = document.createElement("ul");
+  ul.className = "name-list name-list--flags";
+  for (const event of events) {
+    const li = document.createElement("li");
+    if (event.neighbourCountryFlag) {
+      const flag = document.createElement("span");
+      flag.className = "country-flag";
+      flag.textContent = event.neighbourCountryFlag;
+      flag.setAttribute("aria-hidden", "true");
+      li.appendChild(flag);
+      const sr = document.createElement("span");
+      sr.className = "visually-hidden";
+      sr.textContent = event.neighbourCountryAccessibleName;
+      li.appendChild(sr);
+      li.title = event.neighbourCountryAccessibleName;
+    } else {
+      li.textContent = event.neighbourCountryCode;
+      li.setAttribute("aria-label", event.neighbourCountryAccessibleName);
+    }
+    ul.appendChild(li);
+  }
+  cell.appendChild(ul);
 }
 
 function setDistanceCell(cell: HTMLTableCellElement, km: number | null): void {

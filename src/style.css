@@ -497,8 +497,14 @@ th[aria-sort="descending"] .sort-header-btn::after {
   padding-left: 1.15rem;
 }
 
-.name-list li {
-  margin: 0.15rem 0;
+.country-flag {
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+.name-list--flags {
+  list-style: none;
+  padding-left: 0;
 }
 
 .global-block {

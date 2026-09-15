@@ -6,6 +6,7 @@ import {
   normalisedEventLongName,
   normaliseCountrySiteUrl,
 } from "./analytics";
+import { presentationForParkrunCountry } from "./countryFlag";
 import { coordinatesFromFeature, haversineKm } from "./isolationGeometry";
 import { UNKNOWN_SERIES_HEADING, getSeriesHeading } from "./seriesLabels";
 import type { Feature, ParkrunEventsDocument } from "./types";
@@ -14,6 +15,8 @@ export interface IsolationEventExtreme {
   name: string;
   neighbourName: string;
   neighbourCountryCode: string;
+  neighbourCountryFlag: string;
+  neighbourCountryAccessibleName: string;
 }
 
 export interface IsolationCountryRow {
@@ -107,7 +110,26 @@ function nearestNeighbour(event: LocatedEvent, pool: LocatedEvent[]): NearestRes
   return best;
 }
 
+function extremeFromMatch(
+  doc: ParkrunEventsDocument,
+  match: { event: LocatedEvent; nearest: NearestResult }
+): IsolationEventExtreme {
+  const neighbourCountryCode = match.nearest.neighbour.countryCode;
+  const presentation = presentationForParkrunCountry(
+    neighbourCountryCode,
+    normaliseCountrySiteUrl(doc.countries[neighbourCountryCode]?.url)
+  );
+  return {
+    name: match.event.name,
+    neighbourName: match.nearest.neighbour.name,
+    neighbourCountryCode,
+    neighbourCountryFlag: presentation.flag,
+    neighbourCountryAccessibleName: presentation.accessibleName,
+  };
+}
+
 function extremesFromResults(
+  doc: ParkrunEventsDocument,
   results: { event: LocatedEvent; nearest: NearestResult }[],
   mode: "longest" | "shortest",
   collator: Intl.Collator
@@ -122,11 +144,7 @@ function extremesFromResults(
   const selected = mode === "shortest" ? dedupeMutualNearestPairs(matches, collator) : matches;
   return {
     distanceKm: target,
-    items: selected.map((m) => ({
-      name: m.event.name,
-      neighbourName: m.nearest.neighbour.name,
-      neighbourCountryCode: m.nearest.neighbour.countryCode,
-    })),
+    items: selected.map((m) => extremeFromMatch(doc, m)),
   };
 }
 
@@ -175,8 +193,8 @@ function buildIsolationCountryRows(
   const codes = [...byCountry.keys()].sort((a, b) => compareCountryCodes(a, b, collator));
   return codes.map((countryCode) => {
     const countryResults = byCountry.get(countryCode) ?? [];
-    const longest = extremesFromResults(countryResults, "longest", collator);
-    const shortest = extremesFromResults(countryResults, "shortest", collator);
+    const longest = extremesFromResults(doc, countryResults, "longest", collator);
+    const shortest = extremesFromResults(doc, countryResults, "shortest", collator);
     return {
       countryCode,
       countryUrl: normaliseCountrySiteUrl(doc.countries[countryCode]?.url),
@@ -209,8 +227,8 @@ function buildSeriesBlock(
   if (results.length === 0) {
     return null;
   }
-  const globalLongest = extremesFromResults(results, "longest", collator);
-  const globalShortest = extremesFromResults(results, "shortest", collator);
+  const globalLongest = extremesFromResults(doc, results, "longest", collator);
+  const globalShortest = extremesFromResults(doc, results, "shortest", collator);
   return {
     title,
     isUnknown,

@@ -69,6 +69,7 @@ describe("computeIsolationSeriesBlocks", () => {
     // AU pair are each other's nearest; Remote Gamma is far from both
     expect(uk!.longest.map((e) => e.name)).toEqual(["Remote Gamma"]);
     expect(uk!.longest[0].neighbourName).toMatch(/Near/);
+    expect(uk!.longest[0].neighbourCountryFlag).toBe("🇦🇺");
     expect(uk!.longestDistanceKm).toBeGreaterThan(1000);
 
     expect(au!.shortestDistanceKm).toBeLessThan(5);
