@@ -119,14 +119,46 @@ function extremesFromResults(
   const target = mode === "longest" ? Math.max(...distances) : Math.min(...distances);
   const matches = results.filter((r) => r.nearest.distanceKm === target);
   matches.sort((a, b) => collator.compare(a.event.name, b.event.name));
+  const selected = mode === "shortest" ? dedupeMutualNearestPairs(matches, collator) : matches;
   return {
     distanceKm: target,
-    items: matches.map((m) => ({
+    items: selected.map((m) => ({
       name: m.event.name,
       neighbourName: m.nearest.neighbour.name,
       neighbourCountryCode: m.nearest.neighbour.countryCode,
     })),
   };
+}
+
+function dedupeMutualNearestPairs(
+  matches: { event: LocatedEvent; nearest: NearestResult }[],
+  collator: Intl.Collator
+): { event: LocatedEvent; nearest: NearestResult }[] {
+  const byKey = new Map(matches.map((m) => [m.event.key, m]));
+  const emittedPairs = new Set<string>();
+  const out: { event: LocatedEvent; nearest: NearestResult }[] = [];
+
+  for (const match of matches) {
+    const neighbourKey = match.nearest.neighbour.key;
+    const reverse = byKey.get(neighbourKey);
+    const isMutual = reverse !== undefined && reverse.nearest.neighbour.key === match.event.key;
+
+    if (isMutual) {
+      const pairId = [match.event.key, neighbourKey].sort().join("\0");
+      if (emittedPairs.has(pairId)) {
+        continue;
+      }
+      emittedPairs.add(pairId);
+      const preferFirst =
+        collator.compare(match.event.name, match.nearest.neighbour.name) <= 0 ? match : reverse;
+      out.push(preferFirst);
+      continue;
+    }
+    out.push(match);
+  }
+
+  out.sort((a, b) => collator.compare(a.event.name, b.event.name));
+  return out;
 }
 
 function buildIsolationCountryRows(

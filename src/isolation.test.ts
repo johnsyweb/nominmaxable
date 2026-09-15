@@ -85,7 +85,7 @@ describe("computeIsolationSeriesBlocks", () => {
     expect(allNames).not.toContain("No Geometry");
   });
 
-  it("lists tied extremes when nearest-neighbour distances match", () => {
+  it("lists a mutual closest pair once for shortest isolation", () => {
     const doc: ParkrunEventsDocument = {
       countries: { 1: { url: null } },
       events: {
@@ -98,7 +98,11 @@ describe("computeIsolationSeriesBlocks", () => {
     };
     const blocks = computeIsolationSeriesBlocks(doc, collator);
     const row = blocks[0].countries[0];
-    expect(row.shortest.map((e) => e.name).sort()).toEqual(["Close A", "Close B"]);
+    expect(row.shortest).toHaveLength(1);
+    expect([row.shortest[0].name, row.shortest[0].neighbourName].sort()).toEqual([
+      "Close A",
+      "Close B",
+    ]);
     expect(row.longest.map((e) => e.name)).toEqual(["Far C"]);
     expect(row.longestDistanceKm!).toBeGreaterThan(row.shortestDistanceKm!);
   });
