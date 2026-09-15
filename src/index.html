@@ -165,7 +165,15 @@
       <div id="error-banner" role="alert" class="banner banner--error" hidden></div>
 
       <main id="content" role="main" aria-busy="false">
-        <p class="intro">
+        <div class="view-switch" role="group" aria-label="Analysis view">
+          <button type="button" id="view-names" class="view-switch__btn" aria-pressed="true">
+            Full event name lengths
+          </button>
+          <button type="button" id="view-isolation" class="view-switch__btn" aria-pressed="false">
+            Nearest-neighbour isolation
+          </button>
+        </div>
+        <p id="intro" class="intro">
           Longest and shortest full event name strings (by character count) from parkrun's public
           event listing, grouped by event series and country.
         </p>

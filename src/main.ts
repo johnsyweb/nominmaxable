@@ -2,8 +2,18 @@ import { computeSeriesBlocks, createNameCollator, parseParkrunDocument } from ".
 import { isFresh, isQuotaExceededError, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
 import { formatLastUpdated } from "./formatLastUpdated";
+import { computeIsolationSeriesBlocks } from "./isolation";
 import { renderSeriesBlocks } from "./render";
+import { renderIsolationSeriesBlocks } from "./renderIsolation";
+import type { ParkrunEventsDocument } from "./types";
 import { userVisibleErrorDetail } from "./userVisibleErrorDetail";
+
+type AnalysisView = "names" | "isolation";
+
+const INTRO_NAMES =
+  "Longest and shortest full event name strings (by character count) from parkrun's public event listing, grouped by event series and country.";
+const INTRO_ISOLATION =
+  "Longest and shortest distances to the nearest other event in the same series (haversine, kilometres), grouped by event series and country. Events without coordinates are omitted.";
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -14,6 +24,8 @@ function requireElement(id: string): HTMLElement {
 }
 
 let politeClearTimer: number | undefined;
+let currentDoc: ParkrunEventsDocument | null = null;
+let analysisView: AnalysisView = "names";
 
 function announcePolite(message: string): void {
   const el = requireElement("sr-polite");
@@ -92,14 +104,36 @@ function setErrorVisible(visible: boolean, headline?: string, detail?: string | 
   }
 }
 
+function updateViewSwitchUi(): void {
+  const namesBtn = requireElement("view-names");
+  const isolationBtn = requireElement("view-isolation");
+  namesBtn.setAttribute("aria-pressed", analysisView === "names" ? "true" : "false");
+  isolationBtn.setAttribute("aria-pressed", analysisView === "isolation" ? "true" : "false");
+  requireElement("intro").textContent = analysisView === "names" ? INTRO_NAMES : INTRO_ISOLATION;
+}
+
+function renderAnalysisResults(): void {
+  const results = requireElement("results");
+  if (!currentDoc) {
+    renderSeriesBlocks(results, []);
+    return;
+  }
+  const collator = createNameCollator();
+  if (analysisView === "names") {
+    renderSeriesBlocks(results, computeSeriesBlocks(currentDoc, collator));
+  } else {
+    renderIsolationSeriesBlocks(results, computeIsolationSeriesBlocks(currentDoc, collator));
+  }
+  updateViewSwitchUi();
+}
+
 function renderFromBody(
   body: string,
   context: { stale: boolean; fetchedAt: number; couldNotPersistLocally?: boolean }
 ): void {
   try {
-    const doc = parseParkrunDocument(body);
-    const blocks = computeSeriesBlocks(doc, createNameCollator());
-    renderSeriesBlocks(requireElement("results"), blocks);
+    currentDoc = parseParkrunDocument(body);
+    renderAnalysisResults();
     setLastUpdated(
       context.stale
         ? `Showing cached data from ${formatLastUpdated(context.fetchedAt)} (may be out of date)`
@@ -110,6 +144,7 @@ function renderFromBody(
     setStaleVisible(context.stale);
     setErrorVisible(false);
   } catch (err) {
+    currentDoc = null;
     clearResults();
     setStaleVisible(false);
     const detail = userVisibleErrorDetail(err);
@@ -122,6 +157,7 @@ function renderFromBody(
 }
 
 function clearResults(): void {
+  currentDoc = null;
   renderSeriesBlocks(requireElement("results"), []);
   setLastUpdated("");
 }
@@ -175,12 +211,33 @@ async function bootstrap(): Promise<void> {
   await runFetch(cached);
 }
 
+function setAnalysisView(view: AnalysisView): void {
+  if (analysisView === view) {
+    return;
+  }
+  analysisView = view;
+  renderAnalysisResults();
+  announcePolite(
+    view === "names"
+      ? "Showing full event name length analysis"
+      : "Showing nearest-neighbour isolation analysis"
+  );
+}
+
 function init(): void {
   const refresh = requireElement("btn-refresh");
   refresh.addEventListener("click", () => {
     void runFetch(readCache());
   });
 
+  requireElement("view-names").addEventListener("click", () => {
+    setAnalysisView("names");
+  });
+  requireElement("view-isolation").addEventListener("click", () => {
+    setAnalysisView("isolation");
+  });
+
+  updateViewSwitchUi();
   void bootstrap();
 }
 
