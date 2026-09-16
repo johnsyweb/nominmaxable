@@ -18,11 +18,17 @@ export interface Feature {
   };
 }
 
+/** An event as shown in extreme name lists, with optional feed slug for cards. */
+export interface ListedEvent {
+  name: string;
+  eventname: string | null;
+}
+
 export interface CountryRow {
   countryCode: string;
   countryUrl: string;
-  longest: string[];
-  shortest: string[];
+  longest: ListedEvent[];
+  shortest: ListedEvent[];
   longestCharCount: number | null;
   shortestCharCount: number | null;
 }
@@ -31,8 +37,8 @@ export interface SeriesBlock {
   title: string;
   isUnknown: boolean;
   countries: CountryRow[];
-  globalLongest: string[];
-  globalShortest: string[];
+  globalLongest: ListedEvent[];
+  globalShortest: ListedEvent[];
   globalLongestCharCount: number | null;
   globalShortestCharCount: number | null;
 }

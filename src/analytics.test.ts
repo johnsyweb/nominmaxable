@@ -5,6 +5,7 @@ import {
   compareCountryCodes,
   computeSeriesBlocks,
   createNameCollator,
+  extremeListedEvents,
   extremeNames,
   normaliseCountrySiteUrl,
   normalisedCountryCode,
@@ -127,6 +128,20 @@ describe("extremeNames", () => {
   });
 });
 
+describe("extremeListedEvents", () => {
+  it("returns listed events tied on name length with eventname preserved", () => {
+    const events = [
+      { name: "aa", eventname: "a" },
+      { name: "bbb", eventname: "b1" },
+      { name: "ccc", eventname: "c1" },
+    ];
+    expect(extremeListedEvents(events, "longest", collator)).toEqual([
+      { name: "bbb", eventname: "b1" },
+      { name: "ccc", eventname: "c1" },
+    ]);
+  });
+});
+
 describe("parseParkrunDocument", () => {
   it("parses a minimal valid document", () => {
     const body = JSON.stringify({
@@ -205,12 +220,12 @@ describe("computeSeriesBlocks", () => {
   it("computes per-country and global extremes inside each series", () => {
     const blocks = computeSeriesBlocks(sampleDoc(), collator);
     const series1 = blocks[0];
-    expect(series1.globalShortest).toEqual(["Tiny"]);
-    expect(series1.globalLongest).toEqual(["Much longer name"]);
+    expect(series1.globalShortest).toEqual([{ name: "Tiny", eventname: null }]);
+    expect(series1.globalLongest).toEqual([{ name: "Much longer name", eventname: null }]);
 
     const country1 = series1.countries.find((c) => c.countryCode === "1");
-    expect(country1?.shortest).toEqual(["Short"]);
-    expect(country1?.longest).toEqual(["Much longer name"]);
+    expect(country1?.shortest).toEqual([{ name: "Short", eventname: null }]);
+    expect(country1?.longest).toEqual([{ name: "Much longer name", eventname: null }]);
     expect(series1.globalLongestCharCount).toBe("Much longer name".length);
     expect(series1.globalShortestCharCount).toBe("Tiny".length);
     expect(country1?.longestCharCount).toBe("Much longer name".length);

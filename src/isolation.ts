@@ -13,7 +13,9 @@ import type { Feature, ParkrunEventsDocument } from "./types";
 
 export interface IsolationEventExtreme {
   name: string;
+  eventname: string | null;
   neighbourName: string;
+  neighbourEventname: string | null;
   neighbourCountryCode: string;
   neighbourCountryFlag: string;
   neighbourCountryAccessibleName: string;
@@ -40,6 +42,7 @@ export interface IsolationSeriesBlock {
 
 interface LocatedEvent {
   key: string;
+  eventname: string | null;
   name: string;
   countryCode: string;
   lon: number;
@@ -58,14 +61,15 @@ function eventKey(
   name: string,
   lon: number,
   lat: number
-): string {
+): { key: string; eventname: string | null } {
   if (typeof props.eventname === "string" && props.eventname.trim() !== "") {
-    return props.eventname.trim();
+    const eventname = props.eventname.trim();
+    return { key: eventname, eventname };
   }
   if (typeof props.EventShortName === "string" && props.EventShortName.trim() !== "") {
-    return `${countryCode}:${props.EventShortName.trim()}`;
+    return { key: `${countryCode}:${props.EventShortName.trim()}`, eventname: null };
   }
-  return `${countryCode}:${name}:${lon}:${lat}`;
+  return { key: `${countryCode}:${name}:${lon}:${lat}`, eventname: null };
 }
 
 function locatedEventFromFeature(feature: Feature): LocatedEvent | null {
@@ -82,8 +86,10 @@ function locatedEventFromFeature(feature: Feature): LocatedEvent | null {
   if (!coords) {
     return null;
   }
+  const identity = eventKey(props, countryCode, name, coords.lon, coords.lat);
   return {
-    key: eventKey(props, countryCode, name, coords.lon, coords.lat),
+    key: identity.key,
+    eventname: identity.eventname,
     name,
     countryCode,
     lon: coords.lon,
@@ -121,7 +127,9 @@ function extremeFromMatch(
   );
   return {
     name: match.event.name,
+    eventname: match.event.eventname,
     neighbourName: match.nearest.neighbour.name,
+    neighbourEventname: match.nearest.neighbour.eventname,
     neighbourCountryCode,
     neighbourCountryFlag: presentation.flag,
     neighbourCountryAccessibleName: presentation.accessibleName,

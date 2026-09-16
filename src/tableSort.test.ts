@@ -53,8 +53,8 @@ describe("globalRowsFromBlock and sortGlobalRows", () => {
       title: "Test",
       isUnknown: false,
       countries: [],
-      globalLongest: ["aaa"],
-      globalShortest: ["b"],
+      globalLongest: [{ name: "aaa", eventname: null }],
+      globalShortest: [{ name: "b", eventname: null }],
       globalLongestCharCount: 3,
       globalShortestCharCount: 1,
     };
@@ -69,8 +69,8 @@ describe("globalRowsFromBlock and sortGlobalRows", () => {
       title: "Test",
       isUnknown: false,
       countries: [],
-      globalLongest: ["long"],
-      globalShortest: ["x"],
+      globalLongest: [{ name: "long", eventname: null }],
+      globalShortest: [{ name: "x", eventname: null }],
       globalLongestCharCount: 4,
       globalShortestCharCount: 1,
     };
@@ -83,8 +83,8 @@ describe("globalRowsFromBlock and sortGlobalRows", () => {
 
 describe("compareGlobalRowsByColumn", () => {
   it("compares first full event name in names column", () => {
-    const a = { label: "L", names: ["zebra"], charCount: 1 };
-    const b = { label: "S", names: ["apple"], charCount: 1 };
+    const a = { label: "L", names: [{ name: "zebra", eventname: null }], charCount: 1 };
+    const b = { label: "S", names: [{ name: "apple", eventname: null }], charCount: 1 };
     expect(compareGlobalRowsByColumn(a, b, "names", collator)).toBeGreaterThan(0);
   });
 });
