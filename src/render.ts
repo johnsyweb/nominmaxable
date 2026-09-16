@@ -1,4 +1,6 @@
 import { createNameCollator } from "./analytics";
+import { appendEventNameList } from "./eventNameList";
+import type { EventCardPopoverController } from "./eventCardPopover";
 import type { CountryRow, SeriesBlock } from "./types";
 import {
   type CountrySortColumn,
@@ -29,21 +31,6 @@ function hostnameFromUrl(url: string): string {
   }
 }
 
-function appendNameList(cell: HTMLTableCellElement, names: string[]): void {
-  if (names.length === 0) {
-    cell.textContent = "—";
-    return;
-  }
-  const ul = document.createElement("ul");
-  ul.className = "name-list";
-  for (const name of names) {
-    const li = document.createElement("li");
-    li.textContent = name;
-    ul.appendChild(li);
-  }
-  cell.appendChild(ul);
-}
-
 function setCharacterCountCell(cell: HTMLTableCellElement, count: number | null): void {
   if (count === null) {
     cell.textContent = "—";
@@ -53,7 +40,10 @@ function setCharacterCountCell(cell: HTMLTableCellElement, count: number | null)
   cell.className = "data-table__count";
 }
 
-function createCountryDataRow(row: CountryRow): HTMLTableRowElement {
+function createCountryDataRow(
+  row: CountryRow,
+  popover: EventCardPopoverController | null
+): HTMLTableRowElement {
   const tr = document.createElement("tr");
   const tdCode = document.createElement("td");
   tdCode.textContent = row.countryCode;
@@ -72,13 +62,13 @@ function createCountryDataRow(row: CountryRow): HTMLTableRowElement {
   }
   tr.appendChild(tdLink);
   const tdLong = document.createElement("td");
-  appendNameList(tdLong, row.longest);
+  appendEventNameList(tdLong, row.longest, popover);
   tr.appendChild(tdLong);
   const tdLongCount = document.createElement("td");
   setCharacterCountCell(tdLongCount, row.longestCharCount);
   tr.appendChild(tdLongCount);
   const tdShort = document.createElement("td");
-  appendNameList(tdShort, row.shortest);
+  appendEventNameList(tdShort, row.shortest, popover);
   tr.appendChild(tdShort);
   const tdShortCount = document.createElement("td");
   setCharacterCountCell(tdShortCount, row.shortestCharCount);
@@ -86,10 +76,14 @@ function createCountryDataRow(row: CountryRow): HTMLTableRowElement {
   return tr;
 }
 
-function fillCountryTbody(tbody: HTMLTableSectionElement, rows: CountryRow[]): void {
+function fillCountryTbody(
+  tbody: HTMLTableSectionElement,
+  rows: CountryRow[],
+  popover: EventCardPopoverController | null
+): void {
   tbody.replaceChildren();
   for (const row of rows) {
-    tbody.appendChild(createCountryDataRow(row));
+    tbody.appendChild(createCountryDataRow(row, popover));
   }
 }
 
@@ -142,7 +136,8 @@ function wireCountryTableSort(
   table: HTMLTableElement,
   tbody: HTMLTableSectionElement,
   initialRows: CountryRow[],
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): void {
   const sourceRows = [...initialRows];
   let column: CountrySortColumn = "country";
@@ -150,7 +145,7 @@ function wireCountryTableSort(
 
   const apply = (): void => {
     const sorted = sortCountryRows(sourceRows, column, direction, collator);
-    fillCountryTbody(tbody, sorted);
+    fillCountryTbody(tbody, sorted, popover);
     updateCountryHeaderAria(table, column, direction);
   };
 
@@ -179,14 +174,17 @@ function wireCountryTableSort(
   updateCountryHeaderAria(table, column, direction);
 }
 
-function createGlobalDataRow(row: GlobalTableRow): HTMLTableRowElement {
+function createGlobalDataRow(
+  row: GlobalTableRow,
+  popover: EventCardPopoverController | null
+): HTMLTableRowElement {
   const tr = document.createElement("tr");
   const th = document.createElement("th");
   th.scope = "row";
   th.textContent = row.label;
   tr.appendChild(th);
   const tdNames = document.createElement("td");
-  appendNameList(tdNames, row.names);
+  appendEventNameList(tdNames, row.names, popover);
   tr.appendChild(tdNames);
   const tdCount = document.createElement("td");
   setCharacterCountCell(tdCount, row.charCount);
@@ -194,10 +192,14 @@ function createGlobalDataRow(row: GlobalTableRow): HTMLTableRowElement {
   return tr;
 }
 
-function fillGlobalTbody(tbody: HTMLTableSectionElement, rows: GlobalTableRow[]): void {
+function fillGlobalTbody(
+  tbody: HTMLTableSectionElement,
+  rows: GlobalTableRow[],
+  popover: EventCardPopoverController | null
+): void {
   tbody.replaceChildren();
   for (const row of rows) {
-    tbody.appendChild(createGlobalDataRow(row));
+    tbody.appendChild(createGlobalDataRow(row, popover));
   }
 }
 
@@ -254,7 +256,8 @@ function wireGlobalTableSort(
   table: HTMLTableElement,
   tbody: HTMLTableSectionElement,
   initialRows: GlobalTableRow[],
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): void {
   const sourceRows = [...initialRows];
   let column: GlobalSortColumn = "measure";
@@ -262,7 +265,7 @@ function wireGlobalTableSort(
 
   const apply = (): void => {
     const sorted = sortGlobalRows(sourceRows, column, direction, collator);
-    fillGlobalTbody(tbody, sorted);
+    fillGlobalTbody(tbody, sorted, popover);
     updateGlobalHeaderAria(table, column, direction);
   };
 
@@ -291,7 +294,11 @@ function wireGlobalTableSort(
   updateGlobalHeaderAria(table, column, direction);
 }
 
-function renderCountryTable(block: SeriesBlock, collator: Intl.Collator): HTMLTableElement {
+function renderCountryTable(
+  block: SeriesBlock,
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
+): HTMLTableElement {
   const table = document.createElement("table");
   table.className = "data-table data-table--sortable";
   const caption = document.createElement("caption");
@@ -309,13 +316,17 @@ function renderCountryTable(block: SeriesBlock, collator: Intl.Collator): HTMLTa
   thead.appendChild(hr);
   table.appendChild(thead);
   const tbody = document.createElement("tbody");
-  fillCountryTbody(tbody, sortCountryRows(block.countries, "country", 1, collator));
+  fillCountryTbody(tbody, sortCountryRows(block.countries, "country", 1, collator), popover);
   table.appendChild(tbody);
-  wireCountryTableSort(table, tbody, block.countries, collator);
+  wireCountryTableSort(table, tbody, block.countries, collator, popover);
   return table;
 }
 
-function renderGlobalSection(block: SeriesBlock, collator: Intl.Collator): HTMLElement {
+function renderGlobalSection(
+  block: SeriesBlock,
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
+): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "global-block";
   const table = document.createElement("table");
@@ -333,9 +344,9 @@ function renderGlobalSection(block: SeriesBlock, collator: Intl.Collator): HTMLE
   table.appendChild(thead);
   const tbody = document.createElement("tbody");
   const initialGlobal = globalRowsFromBlock(block);
-  fillGlobalTbody(tbody, sortGlobalRows(initialGlobal, "measure", 1, collator));
+  fillGlobalTbody(tbody, sortGlobalRows(initialGlobal, "measure", 1, collator), popover);
   table.appendChild(tbody);
-  wireGlobalTableSort(table, tbody, initialGlobal, collator);
+  wireGlobalTableSort(table, tbody, initialGlobal, collator, popover);
   wrap.appendChild(
     wrapInTableScroll(
       table,
@@ -345,7 +356,11 @@ function renderGlobalSection(block: SeriesBlock, collator: Intl.Collator): HTMLE
   return wrap;
 }
 
-export function renderSeriesBlocks(container: HTMLElement, blocks: SeriesBlock[]): void {
+export function renderSeriesBlocks(
+  container: HTMLElement,
+  blocks: SeriesBlock[],
+  popover: EventCardPopoverController | null = null
+): void {
   const collator = createNameCollator();
   usedHeadingIds.clear();
   container.replaceChildren();
@@ -369,14 +384,14 @@ export function renderSeriesBlocks(container: HTMLElement, blocks: SeriesBlock[]
     section.appendChild(h4Country);
     section.appendChild(
       wrapInTableScroll(
-        renderCountryTable(block, collator),
+        renderCountryTable(block, collator, popover),
         `Per country results for ${block.title}. Scroll horizontally to view all columns.`
       )
     );
     const h4Global = document.createElement("h4");
     h4Global.textContent = "Global";
     section.appendChild(h4Global);
-    section.appendChild(renderGlobalSection(block, collator));
+    section.appendChild(renderGlobalSection(block, collator, popover));
     container.appendChild(section);
   }
 }

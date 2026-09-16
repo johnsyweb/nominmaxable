@@ -6,6 +6,11 @@ import {
 import { computeSeriesBlocks, createNameCollator, parseParkrunDocument } from "./analytics";
 import { isFresh, isQuotaExceededError, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
+import { buildEventCardDetails, indexFeaturesByEventname } from "./eventCardDetails";
+import {
+  createEventCardPopoverController,
+  type EventCardPopoverController,
+} from "./eventCardPopover";
 import { formatLastUpdated } from "./formatLastUpdated";
 import { computeIsolationSeriesBlocks } from "./isolation";
 import { renderSeriesBlocks } from "./render";
@@ -31,6 +36,7 @@ let currentDoc: ParkrunEventsDocument | null = null;
 let analysisView: AnalysisView = analysisViewFromSearchParams(
   new URLSearchParams(window.location.search)
 );
+let eventCardPopover: EventCardPopoverController | null = null;
 
 function announcePolite(message: string): void {
   const el = requireElement("sr-polite");
@@ -117,17 +123,38 @@ function updateViewSwitchUi(): void {
   requireElement("intro").textContent = analysisView === "names" ? INTRO_NAMES : INTRO_ISOLATION;
 }
 
+function recreateEventCardPopover(doc: ParkrunEventsDocument): EventCardPopoverController {
+  eventCardPopover?.destroy();
+  const index = indexFeaturesByEventname(doc);
+  eventCardPopover = createEventCardPopoverController((eventname) => {
+    const feature = index.get(eventname);
+    if (!feature) {
+      return null;
+    }
+    return buildEventCardDetails(feature, doc.countries);
+  });
+  return eventCardPopover;
+}
+
 function renderAnalysisResults(): void {
   const results = requireElement("results");
+  eventCardPopover?.dismiss();
   if (!currentDoc) {
+    eventCardPopover?.destroy();
+    eventCardPopover = null;
     renderSeriesBlocks(results, []);
     return;
   }
+  const popover = recreateEventCardPopover(currentDoc);
   const collator = createNameCollator();
   if (analysisView === "names") {
-    renderSeriesBlocks(results, computeSeriesBlocks(currentDoc, collator));
+    renderSeriesBlocks(results, computeSeriesBlocks(currentDoc, collator), popover);
   } else {
-    renderIsolationSeriesBlocks(results, computeIsolationSeriesBlocks(currentDoc, collator));
+    renderIsolationSeriesBlocks(
+      results,
+      computeIsolationSeriesBlocks(currentDoc, collator),
+      popover
+    );
   }
   updateViewSwitchUi();
 }
@@ -163,6 +190,8 @@ function renderFromBody(
 
 function clearResults(): void {
   currentDoc = null;
+  eventCardPopover?.destroy();
+  eventCardPopover = null;
   renderSeriesBlocks(requireElement("results"), []);
   setLastUpdated("");
 }
