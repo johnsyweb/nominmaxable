@@ -20,8 +20,7 @@ import { userVisibleErrorDetail } from "./userVisibleErrorDetail";
 
 const INTRO_NAMES =
   "Longest and shortest full event name strings (by character count) from parkrun's public event listing, grouped by event series and country.";
-const INTRO_ISOLATION =
-  "Longest and shortest distances to the nearest other event in the same series (haversine, kilometres), grouped by event series and country. Events without coordinates are omitted.";
+const HAVERSINE_FORMULA_URL = "https://en.wikipedia.org/wiki/Haversine_formula";
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -115,12 +114,37 @@ function setErrorVisible(visible: boolean, headline?: string, detail?: string | 
   }
 }
 
+function setIntroForView(view: AnalysisView): void {
+  const intro = requireElement("intro");
+  if (view === "names") {
+    intro.textContent = INTRO_NAMES;
+    return;
+  }
+  intro.replaceChildren();
+  intro.append(
+    document.createTextNode(
+      "Longest and shortest distances to the nearest other event in the same series ("
+    )
+  );
+  const link = document.createElement("a");
+  link.href = HAVERSINE_FORMULA_URL;
+  link.textContent = "haversine";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  intro.append(link);
+  intro.append(
+    document.createTextNode(
+      ", kilometres), grouped by event series and country. Events without coordinates are omitted."
+    )
+  );
+}
+
 function updateViewSwitchUi(): void {
   const namesBtn = requireElement("view-names");
   const isolationBtn = requireElement("view-isolation");
   namesBtn.setAttribute("aria-pressed", analysisView === "names" ? "true" : "false");
   isolationBtn.setAttribute("aria-pressed", analysisView === "isolation" ? "true" : "false");
-  requireElement("intro").textContent = analysisView === "names" ? INTRO_NAMES : INTRO_ISOLATION;
+  setIntroForView(analysisView);
 }
 
 function recreateEventCardPopover(doc: ParkrunEventsDocument): EventCardPopoverController {
