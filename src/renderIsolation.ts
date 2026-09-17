@@ -1,4 +1,6 @@
 import { createNameCollator } from "./analytics";
+import type { EventCardPopoverController } from "./eventCardPopover";
+import { appendEventNameList } from "./eventNameList";
 import type { IsolationCountryRow, IsolationEventExtreme, IsolationSeriesBlock } from "./isolation";
 import { formatIsolationDistanceKm } from "./isolationGeometry";
 import {
@@ -30,35 +32,27 @@ function hostnameFromUrl(url: string): string {
   }
 }
 
-function appendNameList(cell: HTMLTableCellElement, names: string[]): void {
-  if (names.length === 0) {
-    cell.textContent = "—";
-    return;
-  }
-  const ul = document.createElement("ul");
-  ul.className = "name-list";
-  for (const name of names) {
-    const li = document.createElement("li");
-    li.textContent = name;
-    ul.appendChild(li);
-  }
-  cell.appendChild(ul);
-}
-
-function appendExtremeNames(cell: HTMLTableCellElement, events: IsolationEventExtreme[]): void {
-  appendNameList(
+function appendExtremeNames(
+  cell: HTMLTableCellElement,
+  events: IsolationEventExtreme[],
+  popover: EventCardPopoverController | null
+): void {
+  appendEventNameList(
     cell,
-    events.map((e) => e.name)
+    events.map((e) => ({ name: e.name, eventname: e.eventname })),
+    popover
   );
 }
 
 function appendExtremeNeighbours(
   cell: HTMLTableCellElement,
-  events: IsolationEventExtreme[]
+  events: IsolationEventExtreme[],
+  popover: EventCardPopoverController | null
 ): void {
-  appendNameList(
+  appendEventNameList(
     cell,
-    events.map((e) => e.neighbourName)
+    events.map((e) => ({ name: e.neighbourName, eventname: e.neighbourEventname })),
+    popover
   );
 }
 
@@ -103,7 +97,10 @@ function setDistanceCell(cell: HTMLTableCellElement, km: number | null): void {
   cell.className = "data-table__count";
 }
 
-function createIsolationCountryDataRow(row: IsolationCountryRow): HTMLTableRowElement {
+function createIsolationCountryDataRow(
+  row: IsolationCountryRow,
+  popover: EventCardPopoverController | null
+): HTMLTableRowElement {
   const tr = document.createElement("tr");
   const tdCode = document.createElement("td");
   tdCode.textContent = row.countryCode;
@@ -121,25 +118,25 @@ function createIsolationCountryDataRow(row: IsolationCountryRow): HTMLTableRowEl
   }
   tr.appendChild(tdLink);
   const tdLong = document.createElement("td");
-  appendExtremeNames(tdLong, row.longest);
+  appendExtremeNames(tdLong, row.longest, popover);
   tr.appendChild(tdLong);
   const tdLongDist = document.createElement("td");
   setDistanceCell(tdLongDist, row.longestDistanceKm);
   tr.appendChild(tdLongDist);
   const tdLongNb = document.createElement("td");
-  appendExtremeNeighbours(tdLongNb, row.longest);
+  appendExtremeNeighbours(tdLongNb, row.longest, popover);
   tr.appendChild(tdLongNb);
   const tdLongNbCc = document.createElement("td");
   appendExtremeNeighbourCountries(tdLongNbCc, row.longest);
   tr.appendChild(tdLongNbCc);
   const tdShort = document.createElement("td");
-  appendExtremeNames(tdShort, row.shortest);
+  appendExtremeNames(tdShort, row.shortest, popover);
   tr.appendChild(tdShort);
   const tdShortDist = document.createElement("td");
   setDistanceCell(tdShortDist, row.shortestDistanceKm);
   tr.appendChild(tdShortDist);
   const tdShortNb = document.createElement("td");
-  appendExtremeNeighbours(tdShortNb, row.shortest);
+  appendExtremeNeighbours(tdShortNb, row.shortest, popover);
   tr.appendChild(tdShortNb);
   const tdShortNbCc = document.createElement("td");
   appendExtremeNeighbourCountries(tdShortNbCc, row.shortest);
@@ -149,11 +146,12 @@ function createIsolationCountryDataRow(row: IsolationCountryRow): HTMLTableRowEl
 
 function fillIsolationCountryTbody(
   tbody: HTMLTableSectionElement,
-  rows: IsolationCountryRow[]
+  rows: IsolationCountryRow[],
+  popover: EventCardPopoverController | null
 ): void {
   tbody.replaceChildren();
   for (const row of rows) {
-    tbody.appendChild(createIsolationCountryDataRow(row));
+    tbody.appendChild(createIsolationCountryDataRow(row, popover));
   }
 }
 
@@ -202,7 +200,8 @@ function wireIsolationCountryTableSort(
   table: HTMLTableElement,
   tbody: HTMLTableSectionElement,
   initialRows: IsolationCountryRow[],
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): void {
   const sourceRows = [...initialRows];
   let column: IsolationCountrySortColumn = "country";
@@ -211,7 +210,8 @@ function wireIsolationCountryTableSort(
   const apply = (): void => {
     fillIsolationCountryTbody(
       tbody,
-      sortIsolationCountryRows(sourceRows, column, direction, collator)
+      sortIsolationCountryRows(sourceRows, column, direction, collator),
+      popover
     );
     updateIsolationCountryHeaderAria(table, column, direction);
   };
@@ -241,20 +241,23 @@ function wireIsolationCountryTableSort(
   updateIsolationCountryHeaderAria(table, column, direction);
 }
 
-function createIsolationGlobalDataRow(row: IsolationGlobalTableRow): HTMLTableRowElement {
+function createIsolationGlobalDataRow(
+  row: IsolationGlobalTableRow,
+  popover: EventCardPopoverController | null
+): HTMLTableRowElement {
   const tr = document.createElement("tr");
   const th = document.createElement("th");
   th.scope = "row";
   th.textContent = row.label;
   tr.appendChild(th);
   const tdNames = document.createElement("td");
-  appendExtremeNames(tdNames, row.events);
+  appendExtremeNames(tdNames, row.events, popover);
   tr.appendChild(tdNames);
   const tdDist = document.createElement("td");
   setDistanceCell(tdDist, row.distanceKm);
   tr.appendChild(tdDist);
   const tdNb = document.createElement("td");
-  appendExtremeNeighbours(tdNb, row.events);
+  appendExtremeNeighbours(tdNb, row.events, popover);
   tr.appendChild(tdNb);
   const tdNbCc = document.createElement("td");
   appendExtremeNeighbourCountries(tdNbCc, row.events);
@@ -264,11 +267,12 @@ function createIsolationGlobalDataRow(row: IsolationGlobalTableRow): HTMLTableRo
 
 function fillIsolationGlobalTbody(
   tbody: HTMLTableSectionElement,
-  rows: IsolationGlobalTableRow[]
+  rows: IsolationGlobalTableRow[],
+  popover: EventCardPopoverController | null
 ): void {
   tbody.replaceChildren();
   for (const row of rows) {
-    tbody.appendChild(createIsolationGlobalDataRow(row));
+    tbody.appendChild(createIsolationGlobalDataRow(row, popover));
   }
 }
 
@@ -321,7 +325,8 @@ function wireIsolationGlobalTableSort(
   table: HTMLTableElement,
   tbody: HTMLTableSectionElement,
   initialRows: IsolationGlobalTableRow[],
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): void {
   const sourceRows = [...initialRows];
   let column: IsolationGlobalSortColumn = "measure";
@@ -330,7 +335,8 @@ function wireIsolationGlobalTableSort(
   const apply = (): void => {
     fillIsolationGlobalTbody(
       tbody,
-      sortIsolationGlobalRows(sourceRows, column, direction, collator)
+      sortIsolationGlobalRows(sourceRows, column, direction, collator),
+      popover
     );
     updateIsolationGlobalHeaderAria(table, column, direction);
   };
@@ -362,7 +368,8 @@ function wireIsolationGlobalTableSort(
 
 function renderIsolationCountryTable(
   block: IsolationSeriesBlock,
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): HTMLTableElement {
   const table = document.createElement("table");
   table.className = "data-table data-table--sortable";
@@ -387,16 +394,18 @@ function renderIsolationCountryTable(
   const tbody = document.createElement("tbody");
   fillIsolationCountryTbody(
     tbody,
-    sortIsolationCountryRows(block.countries, "country", 1, collator)
+    sortIsolationCountryRows(block.countries, "country", 1, collator),
+    popover
   );
   table.appendChild(tbody);
-  wireIsolationCountryTableSort(table, tbody, block.countries, collator);
+  wireIsolationCountryTableSort(table, tbody, block.countries, collator, popover);
   return table;
 }
 
 function renderIsolationGlobalSection(
   block: IsolationSeriesBlock,
-  collator: Intl.Collator
+  collator: Intl.Collator,
+  popover: EventCardPopoverController | null
 ): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "global-block";
@@ -417,9 +426,13 @@ function renderIsolationGlobalSection(
   table.appendChild(thead);
   const tbody = document.createElement("tbody");
   const initialGlobal = isolationGlobalRowsFromBlock(block);
-  fillIsolationGlobalTbody(tbody, sortIsolationGlobalRows(initialGlobal, "measure", 1, collator));
+  fillIsolationGlobalTbody(
+    tbody,
+    sortIsolationGlobalRows(initialGlobal, "measure", 1, collator),
+    popover
+  );
   table.appendChild(tbody);
-  wireIsolationGlobalTableSort(table, tbody, initialGlobal, collator);
+  wireIsolationGlobalTableSort(table, tbody, initialGlobal, collator, popover);
   wrap.appendChild(
     wrapInTableScroll(
       table,
@@ -447,7 +460,8 @@ function slugifyId(title: string): string {
 
 export function renderIsolationSeriesBlocks(
   container: HTMLElement,
-  blocks: IsolationSeriesBlock[]
+  blocks: IsolationSeriesBlock[],
+  popover: EventCardPopoverController | null = null
 ): void {
   const collator = createNameCollator();
   usedHeadingIds.clear();
@@ -474,14 +488,14 @@ export function renderIsolationSeriesBlocks(
     section.appendChild(h4Country);
     section.appendChild(
       wrapInTableScroll(
-        renderIsolationCountryTable(block, collator),
+        renderIsolationCountryTable(block, collator, popover),
         `Per country isolation results for ${block.title}. Scroll horizontally to view all columns.`
       )
     );
     const h4Global = document.createElement("h4");
     h4Global.textContent = "Global";
     section.appendChild(h4Global);
-    section.appendChild(renderIsolationGlobalSection(block, collator));
+    section.appendChild(renderIsolationGlobalSection(block, collator, popover));
     container.appendChild(section);
   }
 }

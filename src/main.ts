@@ -6,6 +6,11 @@ import {
 import { computeSeriesBlocks, createNameCollator, parseParkrunDocument } from "./analytics";
 import { isFresh, isQuotaExceededError, readCache, writeCache } from "./cache";
 import { CACHE_MS, EVENTS_JSON_URL } from "./constants";
+import { buildEventCardDetails, indexFeaturesByEventname } from "./eventCardDetails";
+import {
+  createEventCardPopoverController,
+  type EventCardPopoverController,
+} from "./eventCardPopover";
 import { formatLastUpdated } from "./formatLastUpdated";
 import { computeIsolationSeriesBlocks } from "./isolation";
 import { renderSeriesBlocks } from "./render";
@@ -15,8 +20,7 @@ import { userVisibleErrorDetail } from "./userVisibleErrorDetail";
 
 const INTRO_NAMES =
   "Longest and shortest full event name strings (by character count) from parkrun's public event listing, grouped by event series and country.";
-const INTRO_ISOLATION =
-  "Longest and shortest distances to the nearest other event in the same series (haversine, kilometres), grouped by event series and country. Events without coordinates are omitted.";
+const HAVERSINE_FORMULA_URL = "https://en.wikipedia.org/wiki/Haversine_formula";
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -31,6 +35,7 @@ let currentDoc: ParkrunEventsDocument | null = null;
 let analysisView: AnalysisView = analysisViewFromSearchParams(
   new URLSearchParams(window.location.search)
 );
+let eventCardPopover: EventCardPopoverController | null = null;
 
 function announcePolite(message: string): void {
   const el = requireElement("sr-polite");
@@ -109,25 +114,71 @@ function setErrorVisible(visible: boolean, headline?: string, detail?: string | 
   }
 }
 
+function setIntroForView(view: AnalysisView): void {
+  const intro = requireElement("intro");
+  if (view === "names") {
+    intro.textContent = INTRO_NAMES;
+    return;
+  }
+  intro.replaceChildren();
+  intro.append(
+    document.createTextNode(
+      "Longest and shortest distances to the nearest other event in the same series ("
+    )
+  );
+  const link = document.createElement("a");
+  link.href = HAVERSINE_FORMULA_URL;
+  link.textContent = "haversine";
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  intro.append(link);
+  intro.append(
+    document.createTextNode(
+      ", kilometres), grouped by event series and country. Events without coordinates are omitted."
+    )
+  );
+}
+
 function updateViewSwitchUi(): void {
   const namesBtn = requireElement("view-names");
   const isolationBtn = requireElement("view-isolation");
   namesBtn.setAttribute("aria-pressed", analysisView === "names" ? "true" : "false");
   isolationBtn.setAttribute("aria-pressed", analysisView === "isolation" ? "true" : "false");
-  requireElement("intro").textContent = analysisView === "names" ? INTRO_NAMES : INTRO_ISOLATION;
+  setIntroForView(analysisView);
+}
+
+function recreateEventCardPopover(doc: ParkrunEventsDocument): EventCardPopoverController {
+  eventCardPopover?.destroy();
+  const index = indexFeaturesByEventname(doc);
+  eventCardPopover = createEventCardPopoverController((eventname) => {
+    const feature = index.get(eventname);
+    if (!feature) {
+      return null;
+    }
+    return buildEventCardDetails(feature, doc.countries);
+  });
+  return eventCardPopover;
 }
 
 function renderAnalysisResults(): void {
   const results = requireElement("results");
+  eventCardPopover?.dismiss();
   if (!currentDoc) {
+    eventCardPopover?.destroy();
+    eventCardPopover = null;
     renderSeriesBlocks(results, []);
     return;
   }
+  const popover = recreateEventCardPopover(currentDoc);
   const collator = createNameCollator();
   if (analysisView === "names") {
-    renderSeriesBlocks(results, computeSeriesBlocks(currentDoc, collator));
+    renderSeriesBlocks(results, computeSeriesBlocks(currentDoc, collator), popover);
   } else {
-    renderIsolationSeriesBlocks(results, computeIsolationSeriesBlocks(currentDoc, collator));
+    renderIsolationSeriesBlocks(
+      results,
+      computeIsolationSeriesBlocks(currentDoc, collator),
+      popover
+    );
   }
   updateViewSwitchUi();
 }
@@ -163,6 +214,8 @@ function renderFromBody(
 
 function clearResults(): void {
   currentDoc = null;
+  eventCardPopover?.destroy();
+  eventCardPopover = null;
   renderSeriesBlocks(requireElement("results"), []);
   setLastUpdated("");
 }

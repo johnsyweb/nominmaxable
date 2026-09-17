@@ -1,5 +1,5 @@
 import { compareCountryCodes } from "./analytics";
-import type { CountryRow, SeriesBlock } from "./types";
+import type { CountryRow, ListedEvent, SeriesBlock } from "./types";
 
 export type CountrySortColumn =
   "country" | "site" | "longestNames" | "longestCount" | "shortestNames" | "shortestCount";
@@ -8,7 +8,7 @@ export type GlobalSortColumn = "measure" | "names" | "count";
 
 export interface GlobalTableRow {
   label: string;
-  names: string[];
+  names: ListedEvent[];
   charCount: number | null;
 }
 
@@ -40,9 +40,9 @@ function compareNullableCount(a: number | null, b: number | null): number {
   return a - b;
 }
 
-function compareFirstNameList(a: string[], b: string[], collator: Intl.Collator): number {
-  const na = a[0] ?? "";
-  const nb = b[0] ?? "";
+function compareFirstNameList(a: ListedEvent[], b: ListedEvent[], collator: Intl.Collator): number {
+  const na = a[0]?.name ?? "";
+  const nb = b[0]?.name ?? "";
   if (!na && !nb) {
     return 0;
   }

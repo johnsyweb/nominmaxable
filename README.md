@@ -5,11 +5,11 @@ Reports the longest and shortest parkrun full event names — and nearest-neighb
 [![CI/CD](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/johnsyweb/nominmaxable/actions/workflows/ci-cd.yml)
 [![Licence: MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](./LICENSE)
 
-Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and offers two analyses (switchable in the UI): **full event name** length extremes, and **nearest-neighbour isolation** (haversine distance in kilometres to the nearest other event in the same series, any country). Both are shown per event series, per country, and globally. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
+Volunteer-facing utility: it reads a public JSON listing of parkrun events, caches it in the browser for seven days, and offers two analyses (switchable in the UI): **full event name** length extremes, and **nearest-neighbour isolation** ([haversine](https://en.wikipedia.org/wiki/Haversine_formula) distance in kilometres to the nearest other event in the same series, any country). Both are shown per event series, per country, and globally. Event names open a details card (hover, focus, or tap) with curated fields from the feed, a map link, and the event’s parkrun page. Tables are keyboard-sortable; the UI follows the same aubergine/apricot look as [Eventuate](https://www.johnsy.com/eventuate/).
 
 ## Getting started
 
-Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, switch between **Full event name lengths** and **Nearest-neighbour isolation**, then sort columns with the header buttons (Enter or Space). Deep-link the isolation view with [`?view=isolation`](https://www.johnsy.com/nominmaxable/?view=isolation); the name-length view is the default (or use `?view=names`).
+Use the live app at [johnsy.com/nominmaxable](https://www.johnsy.com/nominmaxable/). Open the page, wait for the tables to load, switch between **Full event name lengths** and **Nearest-neighbour isolation**, then sort columns with the header buttons (Enter or Space). Hover or focus an event name (Enter/Space) for a details card with location, an [OpenStreetMap](https://www.openstreetmap.org/) link, and the official event page. Deep-link the isolation view with [`?view=isolation`](https://www.johnsy.com/nominmaxable/?view=isolation); the name-length view is the default (or use `?view=names`).
 
 ## Help
 

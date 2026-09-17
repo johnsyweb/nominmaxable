@@ -1,5 +1,5 @@
 import { UNKNOWN_SERIES_HEADING, getSeriesHeading } from "./seriesLabels";
-import type { CountryRow, ParkrunEventsDocument, SeriesBlock } from "./types";
+import type { CountryRow, ListedEvent, ParkrunEventsDocument, SeriesBlock } from "./types";
 
 export function createNameCollator(): Intl.Collator {
   return new Intl.Collator("en-AU", { sensitivity: "base" });
@@ -32,6 +32,14 @@ function isParkrunEventsDocument(value: unknown): value is ParkrunEventsDocument
 }
 
 export function normalisedEventLongName(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const t = value.trim();
+  return t.length > 0 ? t : null;
+}
+
+export function normalisedEventname(value: unknown): string | null {
   if (typeof value !== "string") {
     return null;
   }
@@ -97,20 +105,28 @@ function seriesKeyFromClassified(classified: "unknown" | number): SeriesKey {
 }
 
 interface Bucket {
-  perCountry: Map<string, Set<string>>;
-  allNames: Set<string>;
+  perCountry: Map<string, Map<string, ListedEvent>>;
+  allEvents: Map<string, ListedEvent>;
 }
 
 function getBucket(map: Map<SeriesKey, Bucket>, key: SeriesKey): Bucket {
   let bucket = map.get(key);
   if (!bucket) {
-    bucket = { perCountry: new Map(), allNames: new Set() };
+    bucket = { perCountry: new Map(), allEvents: new Map() };
     map.set(key, bucket);
   }
   return bucket;
 }
 
-/** All names returned by `extremeNames` for a non-empty set share this length. */
+function listedEventIdentity(event: ListedEvent, countryCode: string): string {
+  return event.eventname ?? `${countryCode}:${event.name}`;
+}
+
+/** All events returned by `extremeListedEvents` for a non-empty list share this name length. */
+export function charCountForListedEvents(events: ListedEvent[]): number | null {
+  return events.length > 0 ? events[0].name.length : null;
+}
+
 export function charCountForExtremeNames(names: string[]): number | null {
   return names.length > 0 ? names[0].length : null;
 }
@@ -132,6 +148,28 @@ export function extremeNames(
   return deduped;
 }
 
+export function extremeListedEvents(
+  events: Iterable<ListedEvent>,
+  mode: "longest" | "shortest",
+  collator: Intl.Collator
+): ListedEvent[] {
+  const list = [...events];
+  if (list.length === 0) {
+    return [];
+  }
+  const lengths = list.map((e) => e.name.length);
+  const target = mode === "longest" ? Math.max(...lengths) : Math.min(...lengths);
+  const matches = list.filter((e) => e.name.length === target);
+  matches.sort((a, b) => {
+    const byName = collator.compare(a.name, b.name);
+    if (byName !== 0) {
+      return byName;
+    }
+    return collator.compare(a.eventname ?? "", b.eventname ?? "");
+  });
+  return matches;
+}
+
 export function compareCountryCodes(a: string, b: string, collator: Intl.Collator): number {
   const na = Number(a);
   const nb = Number(b);
@@ -151,17 +189,17 @@ function buildCountryRows(
   );
   codes.sort((a, b) => compareCountryCodes(a, b, collator));
   return codes.map((countryCode) => {
-    const names = bucket.perCountry.get(countryCode) ?? new Set<string>();
+    const countryEvents = [...(bucket.perCountry.get(countryCode)?.values() ?? [])];
     const countryUrl = normaliseCountrySiteUrl(doc.countries[countryCode]?.url);
-    const longest = extremeNames(names, "longest", collator);
-    const shortest = extremeNames(names, "shortest", collator);
+    const longest = extremeListedEvents(countryEvents, "longest", collator);
+    const shortest = extremeListedEvents(countryEvents, "shortest", collator);
     return {
       countryCode,
       countryUrl,
       longest,
       shortest,
-      longestCharCount: charCountForExtremeNames(longest),
-      shortestCharCount: charCountForExtremeNames(shortest),
+      longestCharCount: charCountForListedEvents(longest),
+      shortestCharCount: charCountForListedEvents(shortest),
     };
   });
 }
@@ -182,16 +220,21 @@ export function computeSeriesBlocks(
     if (!countryCode) {
       continue;
     }
+    const listed: ListedEvent = {
+      name,
+      eventname: normalisedEventname(props.eventname),
+    };
+    const identity = listedEventIdentity(listed, countryCode);
     const classified = classifySeriesId(props.seriesid);
     const key = seriesKeyFromClassified(classified);
     const bucket = getBucket(buckets, key);
-    let countrySet = bucket.perCountry.get(countryCode);
-    if (!countrySet) {
-      countrySet = new Set<string>();
-      bucket.perCountry.set(countryCode, countrySet);
+    let countryMap = bucket.perCountry.get(countryCode);
+    if (!countryMap) {
+      countryMap = new Map();
+      bucket.perCountry.set(countryCode, countryMap);
     }
-    countrySet.add(name);
-    bucket.allNames.add(name);
+    countryMap.set(identity, listed);
+    bucket.allEvents.set(identity, listed);
   }
 
   const numericEntries: { id: number; bucket: Bucket }[] = [];
@@ -211,33 +254,41 @@ export function computeSeriesBlocks(
   const blocks: SeriesBlock[] = [];
 
   for (const { id, bucket } of numericEntries) {
-    if (bucket.allNames.size === 0) {
+    if (bucket.allEvents.size === 0) {
       continue;
     }
-    const globalLongest = extremeNames(bucket.allNames, "longest", collator);
-    const globalShortest = extremeNames(bucket.allNames, "shortest", collator);
+    const globalLongest = extremeListedEvents(bucket.allEvents.values(), "longest", collator);
+    const globalShortest = extremeListedEvents(bucket.allEvents.values(), "shortest", collator);
     blocks.push({
       title: getSeriesHeading(id),
       isUnknown: false,
       countries: buildCountryRows(doc, bucket, collator),
       globalLongest,
       globalShortest,
-      globalLongestCharCount: charCountForExtremeNames(globalLongest),
-      globalShortestCharCount: charCountForExtremeNames(globalShortest),
+      globalLongestCharCount: charCountForListedEvents(globalLongest),
+      globalShortestCharCount: charCountForListedEvents(globalShortest),
     });
   }
 
-  if (unknownBucket && unknownBucket.allNames.size > 0) {
-    const globalLongest = extremeNames(unknownBucket.allNames, "longest", collator);
-    const globalShortest = extremeNames(unknownBucket.allNames, "shortest", collator);
+  if (unknownBucket && unknownBucket.allEvents.size > 0) {
+    const globalLongest = extremeListedEvents(
+      unknownBucket.allEvents.values(),
+      "longest",
+      collator
+    );
+    const globalShortest = extremeListedEvents(
+      unknownBucket.allEvents.values(),
+      "shortest",
+      collator
+    );
     blocks.push({
       title: UNKNOWN_SERIES_HEADING,
       isUnknown: true,
       countries: buildCountryRows(doc, unknownBucket, collator),
       globalLongest,
       globalShortest,
-      globalLongestCharCount: charCountForExtremeNames(globalLongest),
-      globalShortestCharCount: charCountForExtremeNames(globalShortest),
+      globalLongestCharCount: charCountForListedEvents(globalLongest),
+      globalShortestCharCount: charCountForListedEvents(globalShortest),
     });
   }
 
